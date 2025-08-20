@@ -1,0 +1,6 @@
+node_modules
+.env
+migrations
+seeders
+readme.md
+test.js
