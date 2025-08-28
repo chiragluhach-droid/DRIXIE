@@ -1,9 +1,10 @@
 const studentm = require('../../models/studentuser');
-const querym=require('../../models/querydetail ')
+const querym=require('../../models/querydetail')
 const responsecon = require('../../helper/response');
 const helper = require('../../helper/helper');
 const jwt =require('jsonwebtoken');
-
+const systemlogm=require('../../models/systemlogs');
+const useractvtym = require('../../models/useractivitylog');
 class Usercontroller{
     async userregistration(req,res){
       const{name,mobile,emeail,stdid,department,university,school,sessionstartyear,endyear,course}=req.body;
@@ -11,7 +12,7 @@ class Usercontroller{
         // ceck existing
         
         const createu = await studentm.create({
-            name,mobile,emeail,stdid,department,university,school,sessionstartyear,endyear,course
+            name,mobile,email:emeail,stdid,department,university,school,sessionstartyear,endyear,course
         });
         if(!createu) return responsecon.failedresponse(res,"failed");
         const mail = await helper.sendsinglemail(emeail,"User Registration To One Stop Solution",`Dear ${name} you have been registered for One stop solution kindly login into our application to acess your query portal.Your student id will be your login id. For more details please visit our website manav rachna`);
@@ -21,7 +22,8 @@ class Usercontroller{
       }
     }
     async userloginotprequest(req,res){
-        const {stdid}=req.body;
+        const {stdid,deviceid,ltd,lgntd}=req.body;
+        if(!deviceid||!ltd||lgntd)return responsecon.failedresponse(res,"Device info got null")
         if(!stdid) return responsecon.failedresponse(res,"Invalid user details");
         try{
             const checkuser = await studentm.findOne({
@@ -33,13 +35,31 @@ class Usercontroller{
             if(!otpsend)return responsecon.failedresponse(res,"Failed to generate otp please try again");
             const mail = await helper.sendsinglemail(res,"Otp for login into One Stop Solution",`Your One Time Passwrd for login to one stop solutions is ${otpsend}. Request from IP ${req.ip}`);
             if(!mail)return responsecon.failedresponse(res,"Otp send ing failed please try again");
+            await useractvtym.create({
+                userId:checkuser.sid,
+                action:'user_login_otp_req',
+                target:'user_login',
+                ip:req.ip,
+                deviceid:deviceid,
+                long:lgntd,
+                latd:ltd
+            });
             return responsecon.successresponse(res,"Otp sent to registrar mail id");
         }catch(err){
+            await systemlogm.create({
+                userId:checkuser.sid||stdid,
+                action:'user_login_otp_req',
+                functionName:'userloginotprequest',
+                error:err.message,
+                params:req.body,
+                ip:req.ip,
+                userAgent:`${deviceid}-${ltd}-${lgntd}`
+            });
             return responsecon.failedresponse(res,"Server is busy pleas etry again");
         }
     }
     async userloginotpsubmit(req,res){
-        const {stdid,otp}=req.body;
+        const {stdid,otp,deviceid,ltd,lgntd}=req.body;
         if(!stdid||!otp) return responsecon.failedresponse(res,"Invalid user details");
         try{
             const checkuser = await studentm.findOne({
@@ -66,16 +86,31 @@ class Usercontroller{
                 { expiresIn: "30d" }
             );
             const enctoken= await helper.balencrypt(token); 
+            await useractvtym.create({
+                userId:checkuser.sid,
+                action:'user_login_otp_submit',
+                target:'user_login',
+                ip:req.ip,
+                deviceid:deviceid,
+                long:lgntd,
+                latd:ltd
+            });
             return responsecon.successresponsewithdata(res,"user login in successfully",enctoken);
         }catch(err){
+            await systemlogm.create({
+                userId:checkuser.sid||stdid,
+                action:'user_login_otp_submit',
+                functionName:'userloginotpsubmit',
+                error:err.message,
+                params:req.body,
+                ip:req.ip,
+                userAgent:`${deviceid}-${ltd}-${lgntd}`
+            });
             return responsecon.failedresponse(res,"Server is busy pleas etry again");
         }
     }
     async profilefetch(req,res){
-
+      
     }
-    
-    
-    
 }
 module.exports=new Usercontroller();

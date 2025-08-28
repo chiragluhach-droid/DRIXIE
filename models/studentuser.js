@@ -9,7 +9,7 @@ const Studentuser = sequelize.define('studentuser', {
   mobile: { type: DataTypes.STRING,allowNull:false,unique:true },
   email: { type: DataTypes.STRING,allowNull:false,unique:true },
   stdid: { type: DataTypes.STRING,allowNull:false,unique:true },
-  sid: { type: DataTypes.UUID,allowNull:false,unique:true },
+  sid: { type: DataTypes.UUID,allowNull:false,unique:true ,defaultValue:DataTypes.UUIDV4},
   deviced: { type: DataTypes.STRING,allowNull:true },
   sessiontoken: { type: DataTypes.STRING,allowNull:true },
   lastlogin: { type: DataTypes.DATE,allowNull:true },
@@ -18,7 +18,7 @@ const Studentuser = sequelize.define('studentuser', {
   school: { type: DataTypes.STRING,allowNull:false },
   isactive: { type: DataTypes.BOOLEAN,allowNull:false,defaultValue:true },
   isdelete: { type: DataTypes.BOOLEAN,allowNull:false,defaultValue:false },
-  sessionstartyear: { type: DataTypes.INTEGER,allowNull:ture },
+  sessionstartyear: { type: DataTypes.INTEGER,allowNull:true },
   endyear: { type: DataTypes.INTEGER,allowNull:true },
   course: { type: DataTypes.STRING,allowNull:true }
 }, {
