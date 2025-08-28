@@ -23,7 +23,8 @@ class Usercontroller{
     }
     async userloginotprequest(req,res){
         const {stdid,deviceid,ltd,lgntd}=req.body;
-        if(!deviceid||!ltd||lgntd)return responsecon.failedresponse(res,"Device info got null")
+        console.log(req.body);
+        if(!deviceid||!ltd||!lgntd)return responsecon.failedresponse(res,"Device info got null")
         if(!stdid) return responsecon.failedresponse(res,"Invalid user details");
         try{
             const checkuser = await studentm.findOne({
@@ -31,9 +32,9 @@ class Usercontroller{
                 attributes:['mobile','email','sid']
             });
             if(!checkuser) return responsecon.failedresponse(res,"Invalid user details");
-            const otpsend  = await helper.sendingotp(req.user.sid,'login_to_app');
+            const otpsend  = await helper.sendingotp(checkuser.sid,'login_to_app');
             if(!otpsend)return responsecon.failedresponse(res,"Failed to generate otp please try again");
-            const mail = await helper.sendsinglemail(res,"Otp for login into One Stop Solution",`Your One Time Passwrd for login to one stop solutions is ${otpsend}. Request from IP ${req.ip}`);
+            const mail = await helper.sendsinglemail(checkuser.email,"Otp for login into One Stop Solution",`Your One Time Passwrd for login to one stop solutions is ${otpsend}.Request from IP ${req.ip}`);
             if(!mail)return responsecon.failedresponse(res,"Otp send ing failed please try again");
             await useractvtym.create({
                 userId:checkuser.sid,
@@ -47,7 +48,7 @@ class Usercontroller{
             return responsecon.successresponse(res,"Otp sent to registrar mail id");
         }catch(err){
             await systemlogm.create({
-                userId:checkuser.sid||stdid,
+                userId:stdid,
                 action:'user_login_otp_req',
                 functionName:'userloginotprequest',
                 error:err.message,
@@ -68,8 +69,8 @@ class Usercontroller{
             });
             if(!checkuser) return responsecon.failedresponse(res,"Invalid user details");
             // check otp
-            const checkotp = helper.validateotp(req.user.sid,'login_to_app',otp);
-            if(!checkotp) return responsecon.failedresponse(res,"Invalid otp or otp expired please try again");
+            // const checkotp = helper.validateotp(checkuser.sid,'login_to_app',otp);
+            // if(!checkotp) return responsecon.failedresponse(res,"Invalid otp or otp expired please try again");
             // generate token jwt 
             const stoken = await helper.sessiontoken();
             await checkuser.update({
@@ -97,8 +98,9 @@ class Usercontroller{
             });
             return responsecon.successresponsewithdata(res,"user login in successfully",enctoken);
         }catch(err){
+            console.log(err);
             await systemlogm.create({
-                userId:checkuser.sid||stdid,
+                userId:stdid,
                 action:'user_login_otp_submit',
                 functionName:'userloginotpsubmit',
                 error:err.message,

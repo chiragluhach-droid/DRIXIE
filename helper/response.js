@@ -6,7 +6,9 @@ class Responsecon{
     }
     successresponsewithdata(res,msg,data){
         return res.status(200).json({
-            txn:true,msg:msg,data:data
+            txn:true,
+            msg:msg,
+            data:data
         })
     }
     failedresponse(res,msg){

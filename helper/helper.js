@@ -184,20 +184,27 @@ class Helper {
   // encrypt decrypt
   // decrypt encrypt
   async balencrypt(bal) {
-    try {
-      if (typeof bal === "number") {
-        bal = bal.toString();
-      }
-      const cipher = crypto.createCipheriv(
-        algorithm,
-        Buffer.from(secretKey),
-        Buffer.from(accessKeyIV)
-      );
-      let encrypted = cipher.update(bal, "utf8", "base64");
-      encrypted += cipher.final("base64");
-      return encrypted;
-    } catch (err) { }
+  try {
+    if (!bal || typeof bal !== "string") {
+      throw new Error("balencrypt: input is missing or not a string");
+    }
+
+    const cipher = crypto.createCipheriv(
+      algorithm,
+      Buffer.from(secretKey),
+      Buffer.from(accessKeyIV)
+    );
+
+    let encrypted = cipher.update(bal, "utf8", "base64");
+    encrypted += cipher.final("base64");
+    return encrypted;
+
+  } catch (err) {
+    console.error("Encryption error:", err.message);
+    throw err; // rethrow so caller knows it failed
   }
+}
+
   async baldecryptt(bal) {
     try {
       const decipher = crypto.createDecipheriv(
