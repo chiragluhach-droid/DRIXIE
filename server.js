@@ -1,6 +1,6 @@
 const express = require("express");
 require("dotenv").config();
-// require('./models/associations')
+// require('./models/association')
 const app = express();
 // 📦 Body Parser Middleware
 const cors = require("cors");

@@ -5,24 +5,48 @@ const catagorym = require('../../models/category');
 const subcatagorym = require('../../models/subcategory')
 const teacherm=require('../../models/teachers');
 const systemlogm = require('../../models/systemlogs');
-const commentm = require('../../models/comment')
+const commentm = require('../../models/comment');
+const autoforwardingm = require('../../models/autoforwarding')
 class Querycontroller{
     async userquerycreatedeaft(req,res){
         const{descrip,catagoryid,subcaragoryid}=req.body;
         if(!descrip||!catagoryid) return responsecon.failedresponse(res,"Invalid parameters");
         try{
+            // check catagory exit or not 
+            const catagorych = await catagorym.findOne({
+                where:{id:catagoryid},
+                attributes:['id']
+            });
+            if(!catagorych)return responsecon.failedresponse(res,"Invalid catagory id");
+            const subcata = await subcatagorym.findOne({
+                where:{catagoryId:catagoryid,id:subcaragoryid},
+                attributes:['id','responsetime']
+            });
+            if(!subcata)return responsecon.failedresponse(res,"Invalid Sub catagory ID");
+            // find teacher automatic 
+            const teacherid= await autoforwardingm.find({
+                where:{catid:catagoryid,subcatid:subcaragoryid},
+                attributes:['teacherrole']
+            });
+            if(!teacherid) return responsecon.failedresponse(res,"No Teacher is assigned");
+            // find teacher according to teacher role 
+            if(teacherid.teacherrole=='Academics'){
+                const teacherid = await teacherm.findOne({
+                        where:{techsch:req.user.school,tchdept:req.user.department,}
+                });
+            }
             let datat = {
                 description:descrip,
                 createdby:req.user.sid,
                 catagoryid:catagoryid,
-            }
-            if(subcaragoryid){
-                 datat.subcaragoryid=subcaragoryid
+                subcaragoryid:subcaragoryid
             }
             const querycreate = await querymodel.create(datat);
             if(!querycreate){
                 return responsecon.failedresponse(res,"Query create failed please again");
             }
+            const mail= await helper.sendsinglemail(req.user.email,"Query created sucessfully",`Your query regarding the catagory has been registered with ref no ${queryid} and estimate time for resolve is ${subcata.responsetime}h`);
+
             return responsecon.successresponse(res,"Query created successfully");
             // attachment allotment 
         }catch(err){
