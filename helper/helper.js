@@ -29,15 +29,15 @@ class Helper {
             return null;
         }
     }
-    compunumber(dep, block, school) {
-        //dep == catagory block = subcatagory 
+    compunumber(dep, school) {
+        //dep == studentid block = subcatagory 
         const depPart = dep.substring(0, 4).padEnd(4, 'X').toUpperCase().replace(/\s+/g, '');
 
         // Generate a random 4-digit number
         const randomPart = String(Math.floor(1000 + Math.random() * 9000));
 
         // Combine all parts
-        let com = `MRUOSS${depPart}${block}${randomPart}`;;
+        let com = `MRUOSS${dep}${school}${randomPart}`;;
         // if (school) {
         //   const sc = school.substring(0, 3).padEnd(3, 'X').toUpperCase().replace(/\s+/g, '');
         //   com = `MRU${depPart}${sc}${block}${randomPart}`
@@ -219,5 +219,7 @@ class Helper {
       return null;
     }
   }
+
+  
 }
 module.exports = new Helper();

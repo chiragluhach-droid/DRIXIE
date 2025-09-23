@@ -18,6 +18,10 @@ const Querydetail = sequelize.define('querydetail', {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  queryno: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
   queryid: {
     type: DataTypes.UUIDV4,
     allowNull: false,

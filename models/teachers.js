@@ -9,8 +9,9 @@ const Teachers = sequelize.define('teachers', {
     type: DataTypes.INTEGER,
   },
   tchid: {
-    type: DataTypes.UUIDV4,
+    type: DataTypes.UUID,
     allowNull: false,
+    defaultValue:DataTypes.UUIDV4
   },
   tchnam: {
     type: DataTypes.STRING,
@@ -37,6 +38,14 @@ const Teachers = sequelize.define('teachers', {
     allowNull: true,
   },
   techdesig: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  sessiontoken: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+   deviceid: {
     type: DataTypes.STRING,
     allowNull: true,
   },

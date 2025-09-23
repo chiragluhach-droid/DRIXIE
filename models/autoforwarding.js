@@ -16,8 +16,16 @@ const Autoforwarding = sequelize.define("autoforwarding", {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
-  teacherrole: {
-    type: DataTypes.STRING,
+  deptid: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  },
+  auforwardingt:{
+    type: DataTypes.UUIDV4,
+    allowNull: true,
+  },
+  assignteacher: {
+    type: DataTypes.UUIDV4,
     allowNull: false,
   },
 }, {

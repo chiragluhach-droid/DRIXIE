@@ -9,10 +9,6 @@ const sequelize = require('../config/database'); // Adjust this to your connecti
     primaryKey: true,
     type: DataTypes.INTEGER,
   },
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
     filename: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -23,7 +19,7 @@ const sequelize = require('../config/database'); // Adjust this to your connecti
     },
     refno: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     url: {
       type: DataTypes.STRING,
