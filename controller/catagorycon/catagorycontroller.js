@@ -4,7 +4,10 @@ const catagorym = require('../../models/category');
 const subcatagorym = require('../../models/subcategory');
 const systemlog = require('../../models/systemlogs')
 class CatagoryController {
-
+    // create catagory
+    async createcatagory(req,res){
+        
+    }
     // fetch query list
     async fetchallcatagorywithsub(req, res) {
         try {

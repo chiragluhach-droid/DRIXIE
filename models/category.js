@@ -21,7 +21,11 @@ const Comment = sequelize.define('querycategory', {
     responsetime: {
       type: DataTypes.INTEGER,
       allowNull: true,
-    }
+    },
+    createdby: {
+    type: DataTypes.UUID,
+    allowNull: false,
+  },
   }, {
     timestamps: true,
     panroid:true,

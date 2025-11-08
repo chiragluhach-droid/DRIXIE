@@ -109,8 +109,8 @@ class Usercontroller {
       if (!checkuser)
         return responsecon.failedresponse(res, "Invalid user details");
       // check otp
-      // const checkotp = helper.validateotp(checkuser.sid,'login_to_app',otp);
-      // if(!checkotp) return responsecon.failedresponse(res,"Invalid otp or otp expired please try again");
+      const checkotp = helper.validateotp(checkuser.sid,'login_to_app',otp);
+      if(!checkotp) return responsecon.failedresponse(res,"Invalid otp or otp expired please try again");
       // generate token jwt
       const stoken = await helper.sessiontoken();
       await checkuser.update(
@@ -122,6 +122,7 @@ class Usercontroller {
           where: { id: checkuser.id },
         }
       );
+      // device id update 
       const secrectkey = process.env.JWTKEY;
       // Generate JWT token
       const token = jwt.sign(

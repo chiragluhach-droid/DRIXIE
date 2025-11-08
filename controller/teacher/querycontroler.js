@@ -186,7 +186,7 @@ class Querycontroller {
   async fetchallquery(req, res) {
     try {
       const allquery = await querymodel.findAll({
-        where: { createdby: req.user.sid, isdeleted: false, deletedAt: null },
+        where: { assignteacher: req.user.sid, isdeleted: false, deletedAt: null },
         attributes: [
           "queryid",
           "status",
@@ -203,11 +203,6 @@ class Querycontroller {
             as: "subcatinfo",
             attributes: ["title"],
           },
-        },
-        include: {
-          model: teacherm,
-          as: "teacherinfo",
-          attributes: ["nanme", "role"],
         },
       });
       return responsecon.successresponsewithdata(
@@ -226,7 +221,7 @@ class Querycontroller {
       return responsecon.failedresponse(res, "Invalid query deails");
     try {
       const fetchquery = await querymodel.findOne({
-        where: { queryid: queryid, createdby: req.user.sid },
+        where: { queryid: queryid },
         attributes: ["assignnow", "status", "catagoryid", "subcaragoryid"],
       });
       if (!fetchquery)
@@ -237,7 +232,9 @@ class Querycontroller {
         attributes: ["message", "createdBy"],
       });
       return responsecon.successresponsewithdata(res, "comment fetched ", comm);
-    } catch (err) {}
+    } catch (err) {
+      return responsecon.servererrorresponse(res)
+    }
   }
   // fetch comments on that query
   /// fetch msgs on that query
@@ -246,7 +243,6 @@ class Querycontroller {
   async uploadattachments(req, res) {
     try {
       const file = req.file;
-
       const up = await attachmentm.create({
         filename: file.filename,
         url: req.file.path,
