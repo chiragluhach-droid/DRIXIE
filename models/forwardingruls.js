@@ -2,7 +2,7 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database'); // Adjust this to your connection path
 
 const ForwardingRules = sequelize.define('forwardingrules', {
-    id: {
+  id: {
     allowNull: false,
     autoIncrement: true,
     primaryKey: true,

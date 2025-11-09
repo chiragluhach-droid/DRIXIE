@@ -19,6 +19,7 @@ class StudentMiddleware {
                         req.user = data;
                         next();
                     } else {
+                        console.log(err)
                         return responsecon.failedresponse(res,"Please Login");
                     }
                 });

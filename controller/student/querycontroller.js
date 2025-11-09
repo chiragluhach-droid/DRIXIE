@@ -9,7 +9,8 @@ const commentm = require("../../models/comment");
 const autoforwardingm = require("../../models/autoforwarding");
 const forwardm = require("../../models/forwardhis");
 const attachmentm = require("../../models/attachment");
-const jwt = require('jsonwebtoken')
+const jwt = require("jsonwebtoken");
+const sequelize = require("../../config/database");
 class Querycontroller {
   async userquerycreatedeaft(req, res) {
     const { descrip, catagoryid, subcaragoryid } = req.body;
@@ -82,7 +83,7 @@ class Querycontroller {
         description: descrip,
         createdby: req.user.sid,
         catagoryid: catagoryid,
-        queryno:helper.compunumber(req.user.stdid,req.user,school)
+        queryno: helper.compunumber(req.user.stdid, req.user.school),
       };
 
       // ✅ Subcategory validation
@@ -90,7 +91,7 @@ class Querycontroller {
         datat.subcaragoryid = subcaragoryid;
         const subcatagoryde = await subcatagorym.findOne({
           where: { id: subcaragoryid },
-          attributes: ["name"],
+          attributes: ["title"],
         });
         if (!subcatagoryde) {
           await t.rollback();
@@ -101,7 +102,7 @@ class Querycontroller {
       // ✅ Category validation
       const catagorycheck = await catagorym.findOne({
         where: { id: catagoryid },
-        attributes: ["name"],
+        attributes: ["title"],
       });
       if (!catagorycheck) {
         await t.rollback();
@@ -110,7 +111,7 @@ class Querycontroller {
 
       // ✅ Check auto forwarding rules
       let checkr = null;
-      if (catagorycheck.name === "Academic") {
+      if (catagorycheck.name === "Academic Related Issues") {
         checkr = await autoforwardingm.findOne({
           where: {
             catid: catagoryid,
@@ -124,7 +125,6 @@ class Querycontroller {
           where: {
             catid: catagoryid,
             subcatid: subcaragoryid,
-            isdeleted: false,
           },
         });
       }
@@ -139,6 +139,7 @@ class Querycontroller {
 
       // ✅ Assign teacher
       const assignid = checkr.assignteacher || checkr.auforwardingt;
+      console.log(assignid);
       if (!assignid) {
         await t.rollback();
         return responsecon.failedresponse(
@@ -146,7 +147,7 @@ class Querycontroller {
           "No valid forwarding user found"
         );
       }
-      datat.assignteacher = assignid;
+      datat.assignnow = assignid;
 
       // ✅ Create query
       const querycreate = await querymodel.create(datat, { transaction: t });
@@ -220,7 +221,6 @@ class Querycontroller {
       await t.commit();
 
       // ✅ Respond immediately
-      
 
       // ✅ Run mails in background
       Promise.allSettled(afterCommitTasks).catch((err) => {
@@ -239,41 +239,84 @@ class Querycontroller {
 
   // fetch query list
   async fetchallquery(req, res) {
-    try {
-      const allquery = await querymodel.findAll({
-        where: { createdby: req.user.sid, isdeleted: false, deletedAt: null },
-        attributes: [
-          "queryid",
-          "status",
-          "assignnow",
-          "catagoryid",
-          "subcaragoryid",
-        ],
-        include: {
-          model: catagorym,
-          as: "cataginfo",
-          attributes: ["title"],
-          include: {
-            model: subcatagorym,
-            as: "subcatinfo",
-            attributes: ["title"],
-          },
-        },
-        include: {
-          model: teacherm,
-          as: "teacherinfo",
-          attributes: ["nanme", "role"],
-        },
-      });
-      return responsecon.successresponsewithdata(
-        res,
-        "Data fetched successfully",
-        allquery
-      );
-    } catch (err) {
-      return responsecon.failedresponse(res, "Server is busy please try later");
+  try {
+    // Extract query params for pagination and filtering
+    let { page = 1, limit = 10, startDate, endDate } = req.query;
+
+    // Convert pagination params to numbers
+    page = parseInt(page);
+    limit = parseInt(limit);
+
+    const offset = (page - 1) * limit;
+
+    // --- Build base where condition ---
+    const where = {
+      createdby: req.user.sid,
+      isdeleted: false,
+      deletedAt: null,
+    };
+
+    // --- Optional date filter ---
+    if (startDate && endDate) {
+      where.createdAt = {
+        [Op.between]: [new Date(startDate), new Date(endDate)],
+      };
+    } else if (startDate) {
+      where.createdAt = {
+        [Op.gte]: new Date(startDate),
+      };
+    } else if (endDate) {
+      where.createdAt = {
+        [Op.lte]: new Date(endDate),
+      };
     }
+
+    // --- Fetch paginated queries ---
+    const { count, rows: allquery } = await querymodel.findAndCountAll({
+      where,
+      attributes: [
+        "queryid",
+        "status",
+        "assignnow",
+        "catagoryid",
+        "subcaragoryid",
+        "createdAt",
+      ],
+      include: [
+        {
+          model: catagorym,
+          as: "querycatagory",
+          attributes: ["title"],
+        },
+        {
+          model: subcatagorym,
+          as: "querysubcatagory",
+          attributes: ["title"],
+        },
+      ],
+      order: [["createdAt", "DESC"]], // latest first
+      limit,
+      offset,
+      distinct: true, // prevents duplicate rows
+      subQuery: false,
+    });
+
+    // --- Pagination metadata ---
+    const totalPages = Math.ceil(count / limit);
+
+    return responsecon.successresponsewithdata(res, "Data fetched successfully", {
+      totalRecords: count,
+      totalPages,
+      currentPage: page,
+      pageSize: limit,
+      data: allquery,
+    });
+  } catch (err) {
+    console.error("Error in fetchallquery:", err);
+    return responsecon.failedresponse(res, "Server is busy, please try later");
   }
+}
+
   // fetch particular query
   async fetchparticularquerycomments(req, res) {
     const { queryid } = req.body;
@@ -318,17 +361,17 @@ class Querycontroller {
   }
   async fetchattachments(req, res) {
     try {
-      const {atid,queryid}=req.body;
+      const { atid, queryid } = req.body;
 
       const up = await attachmentm.findOne({
-        where:{
-          id:atid,
-          refno:queryid,
-          isDeleted:false
-          },
-        attributes:['filename','url','isTeacher','filetype']
+        where: {
+          id: atid,
+          refno: queryid,
+          isDeleted: false,
+        },
+        attributes: ["filename", "url", "isTeacher", "filetype"],
       });
-      if (!up)  return responsecon.failedresponse(res, "Attachment not found");
+      if (!up) return responsecon.failedresponse(res, "Attachment not found");
       const token = jwt.sign(
         {
           fileid: queryid,
@@ -341,9 +384,13 @@ class Querycontroller {
       const dataa = {
         previewUrl: `${process.env.PREVIEW_URL}/api/v1/preview/${token}`,
         type: checkattchment.originalName,
-        name:checkattchment.filename
+        name: checkattchment.filename,
       };
-      return responsecon.successresponsewithdata(res, "Attachment fetch successfully",dataa);
+      return responsecon.successresponsewithdata(
+        res,
+        "Attachment fetch successfully",
+        dataa
+      );
     } catch (err) {
       return responsecon.servererrorresponse(res);
     }
@@ -358,10 +405,10 @@ class Querycontroller {
       const file = await attachmentm.findOne({
         where: {
           id: attachmentId,
-          refno:queryid,
-          isDeleted:false
+          refno: queryid,
+          isDeleted: false,
         },
-        attributes: ['filename','url','isTeacher','filetype'],
+        attributes: ["filename", "url", "isTeacher", "filetype"],
       });
 
       if (!file) {
@@ -372,7 +419,7 @@ class Querycontroller {
 
       // Resolve path to the file on disk
       const filePath = path.join(__dirname, "../../uploads", file.filename);
-      console.log("hvghghggh",filePath)
+      console.log("hvghghggh", filePath);
       if (!fs.existsSync(filePath)) {
         return res
           .status(404)
@@ -397,34 +444,39 @@ class Querycontroller {
     }
   }
   // fetch track histry
-  async trackqueryhis(req,res){
-    const {quid}=req.body
-    if(!quid) return responsecon.failedresponse(res,"Qury id is invalid")
-    try{
-        const queryfetc = await querymodel.findOne({
-            where:{queryno:quid,createdby:req.user.sid},
-            attributes:['queryid']
-        });
-        if(!queryfetc) return responsecon.failedresponse(res,"Query doe snot found");
-        const his = await forwardm.findAll({
-            where:{queryid:queryfetc.queryid,},
-            attributes:['frtid','tid','status'],
-            include:[
-                {
-                    model:teacherm,
-                    as:'forwardteacherd',
-                    attributes:['tchnam','tchrole']
-                },
-                {
-                    model:teacherm,
-                    as:'recieverteacherd',
-                    attributes:['tchnam','tchrole']
-                }
-            ]
-        });
-        return responsecon.successresponsewithdata(res,"Tracking histry fetch successfully",his)
-    }catch(err){
-        return responsecon.servererrorresponse(res)
+  async trackqueryhis(req, res) {
+    const { quid } = req.body;
+    if (!quid) return responsecon.failedresponse(res, "Qury id is invalid");
+    try {
+      const queryfetc = await querymodel.findOne({
+        where: { queryno: quid, createdby: req.user.sid },
+        attributes: ["queryid"],
+      });
+      if (!queryfetc)
+        return responsecon.failedresponse(res, "Query doe snot found");
+      const his = await forwardm.findAll({
+        where: { queryid: queryfetc.queryid },
+        attributes: ["frtid", "tid", "status"],
+        include: [
+          {
+            model: teacherm,
+            as: "forwardteacherd",
+            attributes: ["tchnam", "tchrole"],
+          },
+          {
+            model: teacherm,
+            as: "recieverteacherd",
+            attributes: ["tchnam", "tchrole"],
+          },
+        ],
+      });
+      return responsecon.successresponsewithdata(
+        res,
+        "Tracking histry fetch successfully",
+        his
+      );
+    } catch (err) {
+      return responsecon.servererrorresponse(res);
     }
   }
 }

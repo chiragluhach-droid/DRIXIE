@@ -109,7 +109,8 @@ class Usercontroller {
       if (!checkuser)
         return responsecon.failedresponse(res, "Invalid user details");
       // check otp
-      const checkotp = helper.validateotp(checkuser.sid,'login_to_app',otp);
+      const checkotp = await helper.validateotp(checkuser.sid,'login_to_app',otp);
+      console.log(checkotp)
       if(!checkotp) return responsecon.failedresponse(res,"Invalid otp or otp expired please try again");
       // generate token jwt
       const stoken = await helper.sessiontoken();

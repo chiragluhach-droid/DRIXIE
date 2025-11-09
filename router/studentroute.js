@@ -11,7 +11,7 @@ router.post('/user/signin/otp',studentcon.userloginotprequest);
 router.post('/user/otp/sign/submit',studentcon.userloginotpsubmit);
 // fetch catagories along with sub catagory
 router.post('/user/ctagory/fetch',middleware.jwtusercheck,middleware.userdatacheck,catagorycon.fetchallcatagorywithsub);
-router.post('/user/sub/ctagory/fetch',middleware.jwtusercheck,middleware.userdatacheck,catagorycon.fetchallcatagorywithsub);
+router.post('/user/sub/ctagory/fetch',middleware.jwtusercheck,middleware.userdatacheck,catagorycon.fetchallsubcatagorywithsub);
 // query create
 router.post('/user/query/create',middleware.jwtusercheck,middleware.userdatacheck,querycon.userquerycreatefinal);
 router.post('/user/query/fecthall',middleware.jwtusercheck,middleware.userdatacheck,querycon.fetchallquery);

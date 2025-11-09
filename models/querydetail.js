@@ -51,7 +51,7 @@ const Querydetail = sequelize.define('querydetail', {
     allowNull: true,
   },
 }, {
-  timestamps: false,
+  timestamps: true,
   pnroid: true
 });
 

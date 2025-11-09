@@ -18,7 +18,7 @@ class Responsecon{
     }
     servererrorresponse(res){
         return res.status(500).json({
-            txn:true,msg:"Please try again"
+            txn:false,msg:"Please try again"
         })
     }
 

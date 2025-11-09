@@ -2,70 +2,76 @@ const crypto = require("crypto");
 const algorithm = "aes-256-cbc";
 const secretKey = process.env.SECRECTKKEYI;
 const accessKeyIV = process.env.ACCESSKEYIV;
+const secretKeyo = process.env.SECRECTKKEYIO;
+const accessKeyIVo = process.env.ACCESSKEYIVO;
 const OTP_EXPIRY_TIME = 5 * 60 * 1000; // 5 minutes in milliseconds
 const otpgnrt = require("otp-generator");
 const nodemailer = require("nodemailer");
-const otpmodel = require('../models/otpscheme');
+const otpmodel = require("../models/otpscheme");
 class Helper {
-    async sessiontoken() {
-        try {
-            const otpe = otpgnrt.generate(30, {
-                digits: true,
-                specialChars: true,
-            });
-            return otpe;
-        } catch (err) {
-            return null;
-        }
+  async sessiontoken() {
+    try {
+      const otpe = otpgnrt.generate(30, {
+        digits: true,
+        specialChars: true,
+      });
+      return otpe;
+    } catch (err) {
+      return null;
     }
-    async usertoken() {
-        try {
-            const otpe = otpgnrt.generate(20, {
-                digits: true,
-                specialChars: true,
-            });
-            return otpe;
-        } catch (err) {
-            return null;
-        }
+  }
+  async usertoken() {
+    try {
+      const otpe = otpgnrt.generate(20, {
+        digits: true,
+        specialChars: true,
+      });
+      return otpe;
+    } catch (err) {
+      return null;
     }
-    compunumber(dep, school) {
-        //dep == studentid block = subcatagory 
-        const depPart = dep.substring(0, 4).padEnd(4, 'X').toUpperCase().replace(/\s+/g, '');
+  }
+  compunumber(dep, school) {
+    //dep == studentid block = subcatagory
+    const depPart = dep
+      .substring(0, 4)
+      .padEnd(4, "X")
+      .toUpperCase()
+      .replace(/\s+/g, "");
 
-        // Generate a random 4-digit number
-        const randomPart = String(Math.floor(1000 + Math.random() * 9000));
+    // Generate a random 4-digit number
+    const randomPart = String(Math.floor(1000 + Math.random() * 9000));
 
-        // Combine all parts
-        let com = `MRUOSS${dep}${school}${randomPart}`;;
-        // if (school) {
-        //   const sc = school.substring(0, 3).padEnd(3, 'X').toUpperCase().replace(/\s+/g, '');
-        //   com = `MRU${depPart}${sc}${block}${randomPart}`
-        // } else {
-        //   com = `MRU${depPart}${block}${randomPart}`;
-        // }
-        return com;
-    }
-    // send mail
-    async sendsinglemail(mail, subject, msg) {
-        try {
-            const transporter = nodemailer.createTransport({
-                service: "Gmail",
-                // host: 'smtp.gmail.com',
-                // port: 587,
-                // secure: false,
-                auth: {
-                    user: process.env.GMAIL,
-                    pass: process.env.GPASSWORD,
-                },
-            });
+    // Combine all parts
+    let com = `MRUOSS${dep}${school}${randomPart}`;
+    // if (school) {
+    //   const sc = school.substring(0, 3).padEnd(3, 'X').toUpperCase().replace(/\s+/g, '');
+    //   com = `MRU${depPart}${sc}${block}${randomPart}`
+    // } else {
+    //   com = `MRU${depPart}${block}${randomPart}`;
+    // }
+    return com;
+  }
+  // send mail
+  async sendsinglemail(mail, subject, msg) {
+    try {
+      const transporter = nodemailer.createTransport({
+        service: "Gmail",
+        // host: 'smtp.gmail.com',
+        // port: 587,
+        // secure: false,
+        auth: {
+          user: process.env.GMAIL,
+          pass: process.env.GPASSWORD,
+        },
+      });
 
-            await transporter.sendMail({
-                from: `"myMR e-Office" <${process.env.GMAIL}>`,
-                to: mail,
-                subject: subject,
-                text: msg,
-                html: `<div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px;">
+      await transporter.sendMail({
+        from: `"myMR e-Office" <${process.env.GMAIL}>`,
+        to: mail,
+        subject: subject,
+        text: msg,
+        html: `<div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px;">
   <!-- ✅ Main Message -->
   <p style="font-size: 15px; color: #333; text-align: left;">${msg}</p>
 
@@ -107,33 +113,34 @@ class Helper {
   </div>
 </div>
 
-  `});
-
-            return true;
-        } catch (err) {
-            console.log(err)
-            return false;
-        }
+  `,
+      });
+      console.log("trvvbvb");
+      return true;
+    } catch (err) {
+      console.log(err);
+      return false;
     }
-    // 
-      async sendingotp(userid, purpose) {
+  }
+  //
+  async sendingotp(userid, purpose) {
     try {
       const otp = otpgnrt.generate(6, {
         digits: true,
         specialChars: false,
         lowerCaseAlphabets: false,
-        upperCaseAlphabets: false
+        upperCaseAlphabets: false,
       });
       const sendotp = await otpmodel.create({
         userId: userid,
         otp: otp,
         purpose: purpose,
-        status: 0
+        status: 0,
       });
       if (!sendotp) return null;
       return otp;
     } catch (err) {
-      console.log(err)
+      console.log(err);
       return null;
     }
   }
@@ -144,8 +151,8 @@ class Helper {
           userId: userid,
           otp: otp,
           purpose: purpose,
-          status: 0
-        }
+          status: 0,
+        },
       });
       if (!sendotp) return false;
       const now = new Date();
@@ -158,11 +165,11 @@ class Helper {
             status: 1,
             otp: otpgnrt.generate(10, {
               digits: true,
-              specialChars: true
-            })
+              specialChars: true,
+            }),
           },
           { where: { id: sendotp.id } }
-        )
+        );
         return false;
       }
       await sendotp.update(
@@ -170,11 +177,11 @@ class Helper {
           status: 1,
           otp: otpgnrt.generate(10, {
             digits: true,
-            specialChars: true
-          })
+            specialChars: true,
+          }),
         },
         { where: { id: sendotp.id } }
-      )
+      );
       return true;
     } catch (err) {
       console.log(err);
@@ -184,26 +191,25 @@ class Helper {
   // encrypt decrypt
   // decrypt encrypt
   async balencrypt(bal) {
-  try {
-    if (!bal || typeof bal !== "string") {
-      throw new Error("balencrypt: input is missing or not a string");
+    try {
+      if (!bal || typeof bal !== "string") {
+        throw new Error("balencrypt: input is missing or not a string");
+      }
+
+      const cipher = crypto.createCipheriv(
+        algorithm,
+        Buffer.from(secretKey),
+        Buffer.from(accessKeyIV)
+      );
+
+      let encrypted = cipher.update(bal, "utf8", "base64");
+      encrypted += cipher.final("base64");
+      return encrypted;
+    } catch (err) {
+      console.error("Encryption error:", err.message);
+      throw err; // rethrow so caller knows it failed
     }
-
-    const cipher = crypto.createCipheriv(
-      algorithm,
-      Buffer.from(secretKey),
-      Buffer.from(accessKeyIV)
-    );
-
-    let encrypted = cipher.update(bal, "utf8", "base64");
-    encrypted += cipher.final("base64");
-    return encrypted;
-
-  } catch (err) {
-    console.error("Encryption error:", err.message);
-    throw err; // rethrow so caller knows it failed
   }
-}
 
   async baldecryptt(bal) {
     try {
@@ -219,7 +225,40 @@ class Helper {
       return null;
     }
   }
+  async balencrypto(bal) {
+    try {
+      if (!bal || typeof bal !== "string") {
+        throw new Error("balencrypt: input is missing or not a string");
+      }
 
-  
+      const cipher = crypto.createCipheriv(
+        algorithm,
+        Buffer.from(secretKeyo),
+        Buffer.from(accessKeyIVo)
+      );
+
+      let encrypted = cipher.update(bal, "utf8", "base64");
+      encrypted += cipher.final("base64");
+      return encrypted;
+    } catch (err) {
+      console.error("Encryption error:", err.message);
+      throw err; // rethrow so caller knows it failed
+    }
+  }
+
+  async baldecryptto(bal) {
+    try {
+      const decipher = crypto.createDecipheriv(
+        algorithm,
+        Buffer.from(secretKeyo),
+        Buffer.from(accessKeyIVo)
+      );
+      let decrypted = decipher.update(bal, "base64", "utf8");
+      decrypted += decipher.final("utf8");
+      return decrypted;
+    } catch (err) {
+      return null;
+    }
+  }
 }
 module.exports = new Helper();

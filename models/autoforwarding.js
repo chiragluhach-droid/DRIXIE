@@ -1,6 +1,6 @@
 // models/autoforwarding.js
-import { DataTypes } from "sequelize";
-import sequelize from "../config/database.js"; // adjust path based on your setup
+const DataTypes =require("sequelize");
+const sequelize = require("../config/database.js"); // adjust path based on your setup
 
 const Autoforwarding = sequelize.define("autoforwarding", {
   id: {
@@ -34,4 +34,4 @@ const Autoforwarding = sequelize.define("autoforwarding", {
   paranoid:true
 });
 
-export default Autoforwarding;
+module.exports= Autoforwarding;

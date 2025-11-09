@@ -2,35 +2,68 @@ const teacherm = require("../../models/teachers");
 const forwardingm = require("../../models/autoforwarding");
 const responsecon = require("../../helper/response");
 const teacheractiviym = require("../../models/teacheractivitylog");
-const rolem = require('../../models/role')
+const {  postRequest } = require("../../network/networkapi");
+const sequelize = require("../../config/database");
 class ForwardingController {
+
   async autoforwardingrulecreate(req, res) {
     const { tecid, catid, subcatid, deptid, auttid } = req.body;
+    if(!req.user)return responsecon.failedresponse(res, "Invalid User");
+    // --- Basic validation ---
     if (!tecid || !catid || !subcatid) {
-      return responsecon.failedresponse(res, "Invalid parameter");
+      return responsecon.failedresponse(res, "Invalid parameters");
     }
+
     const transaction = await sequelize.transaction();
+
     try {
-      // Validate teacher
-      const teacher = await teacherm.findOne({
-        where: { tchid: tecid, isactive: true },
-        attributes: ["id", "tname"],
-        transaction,
-        lock: transaction.LOCK.UPDATE, // prevent race condition
+      // --- Step 1: Validate teacher IDs ---
+      const teacherIds = [tecid];
+      if (auttid) teacherIds.push(auttid);
+
+      const teachersRes = await postRequest("/teacher/details", {
+        teachers: teacherIds,
       });
 
-      if (!teacher) {
+      // Validate microservice response
+      if (
+        !teachersRes?.data ||
+        !Array.isArray(teachersRes.data) ||
+        teachersRes.data.length === 0
+      ) {
         await transaction.rollback();
-        return responsecon.failedresponse(res, "Invalid teacher id");
+        return responsecon.failedresponse(res, "Invalid teacher details");
       }
 
-      // Check if rule already exists (strict match)
-      const existing = await forwardingm.findOne({
+      // Find the main teacher and optional auto-forward teacher
+      const mainTeacher = teachersRes.data.find((t) => t.userid == tecid);
+      const autoTeacher = auttid
+        ? teachersRes.data.find((t) => t.userid == auttid)
+        : null;
+
+      if (!mainTeacher) {
+        await transaction.rollback();
+        return responsecon.failedresponse(
+          res,
+          "Invalid teacher id (assignteacher)"
+        );
+      }
+
+      if (auttid && !autoTeacher) {
+        await transaction.rollback();
+        return responsecon.failedresponse(
+          res,
+          "Invalid auto-forward teacher id"
+        );
+      }
+
+      // --- Step 2: Check if rule already exists ---
+      const existingRule = await forwardingm.findOne({
         where: {
           catid,
           subcatid,
-          assignteacher: tecid,
           deptid: deptid || null,
+          assignteacher: tecid,
           auforwardingt: auttid || null,
         },
         attributes: ["id"],
@@ -38,13 +71,12 @@ class ForwardingController {
         lock: transaction.LOCK.UPDATE,
       });
 
-      if (existing) {
+      if (existingRule) {
         await transaction.rollback();
         return responsecon.failedresponse(res, "Rule already exists");
       }
-
-      // Insert new rule
-      const createf = await forwardingm.create(
+      // --- Step 3: Create new rule ---
+      const newRule = await forwardingm.create(
         {
           catid,
           subcatid,
@@ -54,22 +86,24 @@ class ForwardingController {
         },
         { transaction }
       );
+      // --- Step 4: Record teacher activity ---
       await teacheractiviym.create({
-        userId: tecid,
+        userId: req.user.userid,
         action: "create_auto_forwarding_rules",
         target: "autoforwarding",
-        targetId: createf.id,
+        targetId: newRule.id,
         status: "success",
-        message: `${teacher.name} has create new assign rule with rule id ${createf.id}`,
+        message: `${req.user.name} with empid ${req.user.employeeId} created a new auto-forwarding rule (ID: ${newRule.id})`,
       });
       await transaction.commit();
-      return responsecon.successresponse(res, "Teacher assigned successfully");
+      return responsecon.successresponsewithdata(res, "Teacher assigned successfully");
     } catch (err) {
       await transaction.rollback();
-      console.error("Error in autoforwardingrule:", err);
-      return responsecon.servererrorresponse(res);
+      console.error("Error in autoforwardingrulecreate:", err);
+      return responsecon.servererrorresponse(res, err.message);
     }
   }
+
   async updateAutoforwardingrule(req, res) {
     const { id, tecid, auttid } = req.body;
 
@@ -179,9 +213,13 @@ class ForwardingController {
       const fetchules = await forwardingm.findAll({
         where: { deletedAt: null },
       });
-      return responsecon.successresponsewithdata(res,"Rules fetch successfully",fetchules)
+      return responsecon.successresponsewithdata(
+        res,
+        "Rules fetch successfully",
+        fetchules
+      );
     } catch (err) {
-         return responsecon.servererrorresponse(res)
+      return responsecon.servererrorresponse(res);
     }
   }
 }

@@ -72,7 +72,7 @@ const ForwardHistory = sequelize.define(
     },
   },
   {
-    timestamps: false,
+    timestamps: true,
     panroid: true,
   }
 );
