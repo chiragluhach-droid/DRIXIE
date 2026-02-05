@@ -22,7 +22,7 @@ router.post('/sub/ctagory/fetch',middleware.jwtusercheck,middleware.userdatachec
 
 // =========================================auto forwarding rules create====================================
 
-router.post('/autoforward/create',middleware.jwtusercheck,assigncon.autoforwardingrulecreate);
+router.post('/autoforward/create',assigncon.autoforwardingrulecreate);
 router.post('/autoforward/update',middleware.jwtusercheck,middleware.userdatacheck,assigncon.updateAutoforwardingrule);
 router.post('/autoforward/delete',middleware.jwtusercheck,middleware.userdatacheck,assigncon.deleteAutoforwardingrule);
 router.post('/autoforward/fetch',middleware.jwtusercheck,middleware.userdatacheck,assigncon.fetchassignrule);

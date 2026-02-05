@@ -10,13 +10,14 @@ class Usercontroller {
       
       const checkuser = await teacherm.findOne({
         wher: { tchid: teacherid },
-        attributes: ["sessiontoken", "deviceid"],
+        attributes: ["id","sessiontoken", "deviceid"],
       });
       if (!checkuser) return responsecon.failedresponse(res, "Invalid teacher");
-      const tokenn = helper.sessiontoken();
+      const tokenn =await  helper.sessiontoken();
+      console.log(tokenn)
       await checkuser.update(
         { sessiontoken: tokenn },
-        { where: { tchid: teacherid } }
+        { where: { tchid: teacherid ,id:checkuser.id} }
       );
       const secrectkey = process.env.JWTKEY;
       const token = jwt.sign(
@@ -27,6 +28,7 @@ class Usercontroller {
       const enctoken = await helper.balencrypt(token);
       return responsecon.successresponsewithdata(res, "", enctoken);
     } catch (err) {
+      console.log(err)
       return responsecon.servererrorresponse(res);
     }
   }

@@ -21,7 +21,7 @@ api.interceptors.request.use(
     const secrectkey = process.env.JWTKEY;
     // Generate JWT token
     const token = jwt.sign(
-      { id: process.env.SECRECTID, timestamp: new Date() },
+      { id: process.env.SECRECTIDONESTOP, timestamp: new Date() },
       secrectkey,
       { expiresIn: "1h" }
     );

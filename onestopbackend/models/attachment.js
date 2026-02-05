@@ -25,6 +25,22 @@ const sequelize = require('../config/database'); // Adjust this to your connecti
       type: DataTypes.STRING,
       allowNull: true,
     },
+    bucket: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    originalname: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    etag: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    size: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
     uploadedBy: {
       type: DataTypes.UUID,
       allowNull: false,
@@ -37,6 +53,7 @@ const sequelize = require('../config/database'); // Adjust this to your connecti
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+
   }, {
     timestamps: true,
     panroid:true,

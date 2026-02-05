@@ -8,6 +8,16 @@ class ForwardingController {
 
   async autoforwardingrulecreate(req, res) {
     const { tecid, catid, subcatid, deptid, auttid } = req.body;
+    const newRule = await forwardingm.create(
+        {
+          catid,
+          subcatid,
+          deptid: deptid || null,
+          assignteacher: tecid,
+          auforwardingt: auttid || null,
+        },
+        // { transaction }
+      );
     if(!req.user)return responsecon.failedresponse(res, "Invalid User");
     // --- Basic validation ---
     if (!tecid || !catid || !subcatid) {

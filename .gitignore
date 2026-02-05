@@ -4,3 +4,6 @@ migrations
 seeders
 readme.md
 test.js
+onestopbackend/migrations
+onestopbackend/uploads
+onestopbackend/test.js

@@ -6,7 +6,7 @@ const middleware = require('../middleware/studentmiddleware');
 const querycon = require('../controller/student/querycontroller')
 const {upload} =require('../middleware/testuploadmiddleware')
 
-router.post('/user/register',studentcon.userregistration);
+// router.post('/user/register',studentcon.userregistration);
 router.post('/user/signin/otp',studentcon.userloginotprequest);
 router.post('/user/otp/sign/submit',studentcon.userloginotpsubmit);
 // fetch catagories along with sub catagory
@@ -24,7 +24,7 @@ router.post('/user/profile/fetch',middleware.jwtusercheck,middleware.userdatache
 // attachments 
 
 router.post('/user/query/attachments',middleware.jwtusercheck,middleware.userdatacheck,querycon.fetchparticularquerycomments);
-router.post('/user/upload/attachments',middleware.jwtusercheck,middleware.userdatacheck,upload.single('file'),querycon.uploadattachments);
+router.post('/                         ',middleware.jwtusercheck,middleware.userdatacheck,upload.single('file'),querycon.uploadattachments);
 router.post('/user/delete/attachments',middleware.jwtusercheck,middleware.userdatacheck,querycon.fetchparticularquerycomments);
 router.get('/preview/:token', querycon.view_url);
 

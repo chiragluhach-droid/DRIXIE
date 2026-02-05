@@ -49,6 +49,7 @@ const Querydetail = sequelize.define('querydetail', {
   subcaragoryid: {
     type: DataTypes.INTEGER,
     allowNull: true,
+    defaultValue:0
   },
 }, {
   timestamps: true,

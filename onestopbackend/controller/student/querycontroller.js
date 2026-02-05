@@ -11,63 +11,16 @@ const forwardm = require("../../models/forwardhis");
 const attachmentm = require("../../models/attachment");
 const jwt = require("jsonwebtoken");
 const sequelize = require("../../config/database");
+const { postRequest } = require("../../network/networkapi");
+const {Op} = require('sequelize')
+const otpg = require('otp-generator')
+const { PutObjectCommand } = require('@aws-sdk/client-s3');
+const crypto = require('crypto');
+const s3 = require('../../config/s3client');
+const { GetObjectCommand } = require('@aws-sdk/client-s3');
+const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 class Querycontroller {
-  async userquerycreatedeaft(req, res) {
-    const { descrip, catagoryid, subcaragoryid } = req.body;
-    if (!descrip || !catagoryid)
-      return responsecon.failedresponse(res, "Invalid parameters");
-    try {
-      // check catagory exit or not
-      const catagorych = await catagorym.findOne({
-        where: { id: catagoryid },
-        attributes: ["id"],
-      });
-      if (!catagorych)
-        return responsecon.failedresponse(res, "Invalid catagory id");
-      const subcata = await subcatagorym.findOne({
-        where: { catagoryId: catagoryid, id: subcaragoryid },
-        attributes: ["id", "responsetime"],
-      });
-      if (!subcata)
-        return responsecon.failedresponse(res, "Invalid Sub catagory ID");
-      // find teacher automatic
-      const teacherid = await autoforwardingm.find({
-        where: { catid: catagoryid, subcatid: subcaragoryid },
-        attributes: ["teacherrole"],
-      });
-      if (!teacherid)
-        return responsecon.failedresponse(res, "No Teacher is assigned");
-      // find teacher according to teacher role
-      if (teacherid.teacherrole == "Academics") {
-        const teacherid = await teacherm.findOne({
-          where: { techsch: req.user.school, tchdept: req.user.department },
-        });
-      }
-      let datat = {
-        description: descrip,
-        createdby: req.user.sid,
-        catagoryid: catagoryid,
-        subcaragoryid: subcaragoryid,
-      };
-      const querycreate = await querymodel.create(datat);
-      if (!querycreate) {
-        return responsecon.failedresponse(
-          res,
-          "Query create failed please again"
-        );
-      }
-      const mail = await helper.sendsinglemail(
-        req.user.email,
-        "Query created sucessfully",
-        `Your query regarding the catagory has been registered with ref no ${queryid} and estimate time for resolve is ${subcata.responsetime}h`
-      );
 
-      return responsecon.successresponse(res, "Query created successfully");
-      // attachment allotment
-    } catch (err) {
-      return responsecon.failedresponse(res, "Please try again server is busy");
-    }
-  }
   async userquerycreatefinal(req, res) {
     const { descrip, catagoryid, subcaragoryid, attachmntid } = req.body;
 
@@ -87,17 +40,17 @@ class Querycontroller {
       };
 
       // ✅ Subcategory validation
-      if (subcaragoryid) {
-        datat.subcaragoryid = subcaragoryid;
-        const subcatagoryde = await subcatagorym.findOne({
-          where: { id: subcaragoryid },
-          attributes: ["title"],
-        });
-        if (!subcatagoryde) {
-          await t.rollback();
-          return responsecon.failedresponse(res, "Invalid subcategory");
-        }
-      }
+      // if (subcaragoryid) {
+      //   datat.subcaragoryid = subcaragoryid;
+      //   const subcatagoryde = await subcatagorym.findOne({
+      //     where: { id: subcaragoryid },
+      //     attributes: ["title"],
+      //   });
+      //   if (!subcatagoryde) {
+      //     await t.rollback();
+      //     return responsecon.failedresponse(res, "Invalid subcategory");
+      //   }
+      // }
 
       // ✅ Category validation
       const catagorycheck = await catagorym.findOne({
@@ -124,7 +77,7 @@ class Querycontroller {
         checkr = await autoforwardingm.findOne({
           where: {
             catid: catagoryid,
-            subcatid: subcaragoryid,
+            // subcatid: subcaragoryid,
           },
         });
       }
@@ -139,7 +92,6 @@ class Querycontroller {
 
       // ✅ Assign teacher
       const assignid = checkr.assignteacher || checkr.auforwardingt;
-      console.log(assignid);
       if (!assignid) {
         await t.rollback();
         return responsecon.failedresponse(
@@ -213,7 +165,7 @@ class Querycontroller {
         helper.sendsinglemail(
           req.user.email,
           "Query created successfully",
-          `Your query regarding the category has been registered with ref no ${querycreate.queryid}.`
+          `Your query regarding the category has been registered with ref no ${datat.queryno} and estimated resolution time is ${datat.queryno}h.`
         )
       );
 
@@ -236,87 +188,101 @@ class Querycontroller {
       );
     }
   }
-
   // fetch query list
   async fetchallquery(req, res) {
-  try {
-    // Extract query params for pagination and filtering
-    let { page = 1, limit = 10, startDate, endDate } = req.query;
+    try {
+      const { page = 1, limit = 10, startDate, endDate } = req.query;
+      const offset = (page - 1) * limit;
 
-    // Convert pagination params to numbers
-    page = parseInt(page);
-    limit = parseInt(limit);
-
-    const offset = (page - 1) * limit;
-
-    // --- Build base where condition ---
-    const where = {
-      createdby: req.user.sid,
-      isdeleted: false,
-      deletedAt: null,
-    };
-
-    // --- Optional date filter ---
-    if (startDate && endDate) {
-      where.createdAt = {
-        [Op.between]: [new Date(startDate), new Date(endDate)],
+      const where = {
+        createdby: req.user.sid,
+        isdeleted: false,
+        deletedAt: null,
       };
-    } else if (startDate) {
-      where.createdAt = {
-        [Op.gte]: new Date(startDate),
-      };
-    } else if (endDate) {
-      where.createdAt = {
-        [Op.lte]: new Date(endDate),
-      };
+
+      if (startDate && endDate) {
+        where.createdAt = {
+          [Op.between]: [new Date(startDate), new Date(endDate)],
+        };
+      }
+
+      const { count, rows: allquery } = await querymodel.findAndCountAll({
+        where,
+        attributes: [
+          "queryno",
+          "queryid",
+          "status",
+          "assignnow",
+          "catagoryid",
+          "subcaragoryid",
+          "createdAt",
+        ],
+        include: [
+          {
+            model: catagorym,
+            as: "querycatagory",
+            attributes: ["title"],
+          },
+          {
+            model: subcatagorym,
+            as: "querysubcatagory",
+            attributes: ["title"],
+          },
+        ],
+        order: [["createdAt", "DESC"]],
+        limit: parseInt(limit),
+        offset,
+        distinct: true,
+        subQuery: false,
+      });
+
+      // --- 🧠 Step 1: Extract unique teacher IDs
+      const teacherIds = [
+        ...new Set(allquery.map((q) => q.assignnow).filter(Boolean)),
+      ];
+
+      let teacherMap = {};
+      if (teacherIds.length > 0) {
+        // --- 🧠 Step 2: Batch microservice call
+        const teacherRes = await postRequest("/teacher/details", {
+          teachers: teacherIds,
+        });
+
+        if (teacherRes?.data?.length) {
+          // --- 🧠 Step 3: Create lookup map
+          teacherMap = Object.fromEntries(
+            teacherRes.data.map((t) => [t.userid, t])
+          );
+        }
+      }
+
+      // --- 🧠 Step 4: Merge teacher data
+      const enrichedQueries = allquery.map((q) => ({
+        ...q.toJSON(),
+        assignTeacher: teacherMap[q.assignnow] || null,
+      }));
+
+      const totalPages = Math.ceil(count / limit);
+
+      return responsecon.successresponsewithdata(
+        res,
+        "Data fetched successfully",
+        {
+          totalRecords: count,
+          totalPages,
+          currentPage: parseInt(page),
+          pageSize: parseInt(limit),
+          data: enrichedQueries,
+        }
+      );
+    } catch (err) {
+      console.error("Error in fetchallquery:", err);
+      return responsecon.failedresponse(
+        res,
+        "Server is busy, please try later"
+      );
     }
-
-    // --- Fetch paginated queries ---
-    const { count, rows: allquery } = await querymodel.findAndCountAll({
-      where,
-      attributes: [
-        "queryid",
-        "status",
-        "assignnow",
-        "catagoryid",
-        "subcaragoryid",
-        "createdAt",
-      ],
-      include: [
-        {
-          model: catagorym,
-          as: "querycatagory",
-          attributes: ["title"],
-        },
-        {
-          model: subcatagorym,
-          as: "querysubcatagory",
-          attributes: ["title"],
-        },
-      ],
-      order: [["createdAt", "DESC"]], // latest first
-      limit,
-      offset,
-      distinct: true, // prevents duplicate rows
-      subQuery: false,
-    });
-
-    // --- Pagination metadata ---
-    const totalPages = Math.ceil(count / limit);
-
-    return responsecon.successresponsewithdata(res, "Data fetched successfully", {
-      totalRecords: count,
-      totalPages,
-      currentPage: page,
-      pageSize: limit,
-      data: allquery,
-    });
-  } catch (err) {
-    console.error("Error in fetchallquery:", err);
-    return responsecon.failedresponse(res, "Server is busy, please try later");
   }
-}
-
   // fetch particular query
   async fetchparticularquerycomments(req, res) {
     const { queryid } = req.body;
@@ -341,7 +307,7 @@ class Querycontroller {
   /// fetch msgs on that query
   // send msgs on that query
   // upload attachments
-  async uploadattachments(req, res) {
+  async uploadattachmentsn(req, res) {
     try {
       const file = req.file;
 
@@ -359,6 +325,75 @@ class Querycontroller {
       return responsecon.servererrorresponse(res);
     }
   }
+  async uploadattachments(req, res) {
+    const { queryid } = req.body;
+
+    if (!queryid) {
+      return responsecon.failedresponse(res, 'Please pass he query id');
+    }
+
+    try {
+      const document = await querymodel.findOne({
+        where: {
+          queryid: queryid,
+          // assignedToId: req.user.userid,
+          // deletedAt: null,
+        },
+      });
+
+      if (!document) {
+        return responsecon.failedresponse(res, 'Invalid query Id');
+      }
+
+      if (!req.file) {
+        return responsecon.failedresponse(res, 'No file uploaded');
+      }
+
+      /* ===== filename ===== */
+      const ext = path.extname(req.file.originalname);
+      
+
+      const otp = otpg.generate(4, { digits: true });
+      const uniq = crypto.randomBytes(4).toString('hex');
+
+      const s3Key = `attachments/${document.queryno}_${otp}_${uniq}${ext}`;
+
+      /* ===== upload ===== */
+      const result = await s3.send(
+        new PutObjectCommand({
+          Bucket: process.env.AWS_BUCKET_NAME,
+          Key: s3Key,
+          Body: req.file.buffer,
+          ContentType: req.file.mimetype,
+        })
+      );
+      console.log('newresult', result);
+      const attachments = await attachmentm.create({
+        filename: s3Key,
+        refno:queryid,
+        url : result?.ChecksumCRC32 || '',
+        isTeacher: false,
+        uploadedBy: req.user.sid,
+        filetype: req.file.mimetype,
+        bucket: process.env.AWS_BUCKET_NAME,
+        originalName: req.file.originalname,
+        size: req.file.size,
+        etag: result.ETag?.replace(/"/g, ''),
+      });
+      
+
+      return responsecon.successresponsewithdata(res, 'Attachments added successfully', {
+        id: attachments.id,
+        size: req.file.size,
+        type: req.file.mimetype,
+      });
+    } catch (err) {
+      console.log(err);
+     
+      return responsecon.servererrorresponse(res, err.message);
+    }
+  }
+  
   async fetchattachments(req, res) {
     try {
       const { atid, queryid } = req.body;
@@ -369,21 +404,20 @@ class Querycontroller {
           refno: queryid,
           isDeleted: false,
         },
-        attributes: ["filename", "url", "isTeacher", "filetype"],
+        attributes: ["isTeacher", "filetype","bucket","filename"],
       });
       if (!up) return responsecon.failedresponse(res, "Attachment not found");
-      const token = jwt.sign(
-        {
-          fileid: queryid,
-          attachmentId: atid,
-          exp: Math.floor(Date.now() / 1000) + 10 * 60, // expires in 5 minutes
-        },
-        process.env.ATTACHMENT_SECRET
+       const signedUrl = await getSignedUrl(
+        s3,
+        new GetObjectCommand({
+          Bucket: up.bucket,
+          Key: up.filename,
+        }),
+        { expiresIn: 15 * 60 } // 15 minutes
       );
-
+     
       const dataa = {
-        previewUrl: `${process.env.PREVIEW_URL}/api/v1/preview/${token}`,
-        type: checkattchment.originalName,
+        previewUrl: signedUrl,
         name: checkattchment.filename,
       };
       return responsecon.successresponsewithdata(
@@ -449,33 +483,41 @@ class Querycontroller {
     if (!quid) return responsecon.failedresponse(res, "Qury id is invalid");
     try {
       const queryfetc = await querymodel.findOne({
-        where: { queryno: quid, createdby: req.user.sid },
+        where: { queryid: quid, createdby: req.user.sid },
         attributes: ["queryid"],
       });
-      if (!queryfetc)
-        return responsecon.failedresponse(res, "Query doe snot found");
+      if (!queryfetc) return responsecon.failedresponse(res, "Query doe snot found");
       const his = await forwardm.findAll({
         where: { queryid: queryfetc.queryid },
         attributes: ["frtid", "tid", "status"],
-        include: [
-          {
-            model: teacherm,
-            as: "forwardteacherd",
-            attributes: ["tchnam", "tchrole"],
-          },
-          {
-            model: teacherm,
-            as: "recieverteacherd",
-            attributes: ["tchnam", "tchrole"],
-          },
-        ],
       });
+      const teachersid = [
+  ...new Set(
+    his
+      .flatMap(item => [item.frtid, item.tid])
+      .filter(Boolean)
+  )
+];
+
+console.log(teachersid)
+      const teachers = await teacherm.findAll({
+        where: {
+    tchid: {
+      [Op.in]: teachersid, // array of tchid values
+    },
+  },
+
+  attributes: ["tchnam","tchid"],
+});
+     /// fetch attachments
+     
       return responsecon.successresponsewithdata(
         res,
         "Tracking histry fetch successfully",
-        his
+        {records:his,teachers}
       );
     } catch (err) {
+      console.log(err)
       return responsecon.servererrorresponse(res);
     }
   }
