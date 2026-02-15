@@ -24,7 +24,7 @@ router.post('/user/profile/fetch',middleware.jwtusercheck,middleware.userdatache
 // attachments 
 
 router.post('/user/query/attachments',middleware.jwtusercheck,middleware.userdatacheck,querycon.fetchparticularquerycomments);
-router.post('/                         ',middleware.jwtusercheck,middleware.userdatacheck,upload.single('file'),querycon.uploadattachments);
+router.post('/user/upload/attachments',middleware.jwtusercheck,middleware.userdatacheck,upload.single('file'),querycon.uploadattachments);
 router.post('/user/delete/attachments',middleware.jwtusercheck,middleware.userdatacheck,querycon.fetchparticularquerycomments);
 router.get('/preview/:token', querycon.view_url);
 
