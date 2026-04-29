@@ -3,7 +3,6 @@ require('dotenv').config();
 
 const Student = require('./onestopbackend/models/studentuser');
 const Category = require('./onestopbackend/models/category');
-const SubCategory = require('./onestopbackend/models/subcategory');
 const Teacher = require('./onestopbackend/models/teachers');
 const AutoForwarding = require('./onestopbackend/models/autoforwarding');
 
@@ -17,7 +16,6 @@ async function seed() {
     // Clear existing data
     await Student.deleteMany({});
     await Category.deleteMany({});
-    await SubCategory.deleteMany({});
     await Teacher.deleteMany({});
     await AutoForwarding.deleteMany({});
     
@@ -29,15 +27,6 @@ async function seed() {
     const cat4 = await Category.create({ title: 'Financial', description: 'Fees and Account queries', createdby: 'system' });
     const cat5 = await Category.create({ title: 'Library', description: 'Library issues', createdby: 'system' });
     const cat6 = await Category.create({ title: 'Transport', description: 'Bus and Transport queries', createdby: 'system' });
-
-    const subCats = await SubCategory.create([
-      { title: 'Exams', description: 'Exam related queries', responsetime: '48', categoryId: cat1._id.toString(), isactive: true },
-      { title: 'Room change', description: 'Room change request', responsetime: '72', categoryId: cat2._id.toString(), isactive: true },
-      { title: 'Wifi issue', description: 'Cannot connect to Wifi', responsetime: '24', categoryId: cat3._id.toString(), isactive: true },
-      { title: 'Fee payment failed', description: 'Payment deducted but not updated', responsetime: '48', categoryId: cat4._id.toString(), isactive: true },
-      { title: 'Book not found', description: 'Book missing from shelf', responsetime: '48', categoryId: cat5._id.toString(), isactive: true },
-      { title: 'Bus pass issue', description: 'Bus pass not generated', responsetime: '48', categoryId: cat6._id.toString(), isactive: true },
-    ]);
 
     // Add dummy teachers for each category
     const teacherAcademic = await Teacher.create({
@@ -123,18 +112,18 @@ async function seed() {
     // Add auto-forwarding rules
     await AutoForwarding.create([
       // Academic
-      { catid: cat1._id.toString(), subcatid: subCats[0]._id.toString(), deptid: 'CS', auforwardingt: teacherAcademic.tchid, assignteacher: teacherAcademic.tchid },
-      { catid: cat1._id.toString(), subcatid: subCats[0]._id.toString(), deptid: 'ME', auforwardingt: teacherAcademic.tchid, assignteacher: teacherAcademic.tchid },
+      { catid: cat1._id.toString(), deptid: 'CS', auforwardingt: teacherAcademic.tchid, assignteacher: teacherAcademic.tchid },
+      { catid: cat1._id.toString(), deptid: 'ME', auforwardingt: teacherAcademic.tchid, assignteacher: teacherAcademic.tchid },
       // Hostel
-      { catid: cat2._id.toString(), subcatid: subCats[1]._id.toString(), auforwardingt: teacherHostel.tchid, assignteacher: teacherHostel.tchid },
+      { catid: cat2._id.toString(), auforwardingt: teacherHostel.tchid, assignteacher: teacherHostel.tchid },
       // Technical
-      { catid: cat3._id.toString(), subcatid: subCats[2]._id.toString(), auforwardingt: teacherTech.tchid, assignteacher: teacherTech.tchid },
+      { catid: cat3._id.toString(), auforwardingt: teacherTech.tchid, assignteacher: teacherTech.tchid },
       // Financial
-      { catid: cat4._id.toString(), subcatid: subCats[3]._id.toString(), auforwardingt: teacherFinance.tchid, assignteacher: teacherFinance.tchid },
+      { catid: cat4._id.toString(), auforwardingt: teacherFinance.tchid, assignteacher: teacherFinance.tchid },
       // Library
-      { catid: cat5._id.toString(), subcatid: subCats[4]._id.toString(), auforwardingt: teacherLibrary.tchid, assignteacher: teacherLibrary.tchid },
+      { catid: cat5._id.toString(), auforwardingt: teacherLibrary.tchid, assignteacher: teacherLibrary.tchid },
       // Transport
-      { catid: cat6._id.toString(), subcatid: subCats[5]._id.toString(), auforwardingt: teacherTransport.tchid, assignteacher: teacherTransport.tchid },
+      { catid: cat6._id.toString(), auforwardingt: teacherTransport.tchid, assignteacher: teacherTransport.tchid },
     ]);
 
     // Add dummy student
