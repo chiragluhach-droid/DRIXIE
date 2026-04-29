@@ -84,28 +84,27 @@ class Querycontroller {
         tchid: { $in: [checkr.auforwardingt, assignid].filter(Boolean) },
       }).select("tchmail");
 
-      // ENHANCED TEACHER UI
       const teacherMsg = `
-      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f4f7f6; padding: 30px; text-align: center;">
-        <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: left;">
-          <div style="background-color: #b71c1c; padding: 20px; text-align: center;">
-            <h2 style="color: #ffffff; margin: 0; font-size: 20px; font-weight: 600;">Action Required: New Request</h2>
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f4f7f6; padding: 15px; text-align: center;">
+        <div style="max-width: 600px; width: 100%; box-sizing: border-box; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: left;">
+          <div style="background-color: #b71c1c; padding: 15px 20px; text-align: center;">
+            <h2 style="color: #ffffff; margin: 0; font-size: 18px; font-weight: 600;">Action Required: New Request</h2>
           </div>
-          <div style="padding: 30px;">
-            <p style="color: #333333; font-size: 16px; line-height: 1.5; margin-top: 0;">A student has raised a new query that has been automatically routed to your department for review.</p>
-            <table style="width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 15px;">
-              <tr><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #666666; width: 120px;"><strong>Request ID</strong></td><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #333333;"><strong>${datat.queryno}</strong></td></tr>
-              <tr><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #666666;"><strong>Student</strong></td><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #333333;">${req.user.name || 'Student'} (${req.user.stdid})</td></tr>
-              <tr><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #666666;"><strong>Category</strong></td><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #333333;">${catagorycheck.title}</td></tr>
-              <tr><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #666666; vertical-align: top;"><strong>Description</strong></td><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #333333; line-height: 1.5;">${descrip}</td></tr>
+          <div style="padding: 20px;">
+            <p style="color: #333333; font-size: 15px; line-height: 1.5; margin-top: 0;">A student has raised a new query that has been automatically routed to your department for review.</p>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px;">
+              <tr><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #666666; width: 30%; min-width: 90px;"><strong>Request ID</strong></td><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #333333;"><strong>${datat.queryno}</strong></td></tr>
+              <tr><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #666666;"><strong>Student</strong></td><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #333333;">${req.user.name || 'Student'} (${req.user.stdid})</td></tr>
+              <tr><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #666666;"><strong>Category</strong></td><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #333333;">${catagorycheck.title}</td></tr>
+              <tr><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #666666; vertical-align: top;"><strong>Description</strong></td><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #333333; line-height: 1.4;">${descrip}</td></tr>
               ${attachmentRow}
             </table>
-            <div style="text-align: center; margin-top: 30px; margin-bottom: 10px;">
-              <a href="https://drixie-backend.onrender.com/api/v1/query/approve/${querycreate.queryid}/hod/token" style="display: inline-block; padding: 14px 28px; background-color: #2e7d32; color: #ffffff; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Approve & Forward to HOD</a>
+            <div style="text-align: center; margin-top: 25px; margin-bottom: 5px;">
+              <a href="https://drixie-backend.onrender.com/api/v1/query/approve/${querycreate.queryid}/hod/token" style="display: inline-block; padding: 12px 24px; background-color: #2e7d32; color: #ffffff; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 15px; max-width: 100%; box-sizing: border-box; word-wrap: break-word;">Approve & Forward to HOD</a>
             </div>
           </div>
         </div>
-        <p style="color: #999999; font-size: 12px; margin-top: 20px;">Automated message from Request Tracking System.</p>
+        <p style="color: #999999; font-size: 12px; margin-top: 15px;">Automated message from Request Tracking System.</p>
       </div>`;
 
       if (techm && techm.length > 0) {
@@ -118,24 +117,23 @@ class Querycontroller {
         }
       }
 
-      // ENHANCED STUDENT CREATION UI
       const studentMsg = `
-      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f4f7f6; padding: 30px; text-align: center;">
-        <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: left;">
-          <div style="background-color: #1a73e8; padding: 20px; text-align: center;">
-            <h2 style="color: #ffffff; margin: 0; font-size: 20px; font-weight: 600;">Request Successfully Registered</h2>
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f4f7f6; padding: 15px; text-align: center;">
+        <div style="max-width: 600px; width: 100%; box-sizing: border-box; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: left;">
+          <div style="background-color: #1a73e8; padding: 15px 20px; text-align: center;">
+            <h2 style="color: #ffffff; margin: 0; font-size: 18px; font-weight: 600;">Request Successfully Registered</h2>
           </div>
-          <div style="padding: 30px;">
-            <p style="color: #333333; font-size: 16px; margin-top: 0;">Dear ${req.user.name || 'Student'},</p>
-            <p style="color: #333333; font-size: 16px; line-height: 1.5;">Your request has been recorded and automatically routed to the appropriate faculty member. We will notify you once there is an update.</p>
-            <table style="width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 15px;">
-              <tr><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #666666; width: 120px;"><strong>Request ID</strong></td><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #333333;"><strong>${datat.queryno}</strong></td></tr>
-              <tr><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #666666;"><strong>Category</strong></td><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #333333;">${catagorycheck.title}</td></tr>
-              <tr><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #666666; vertical-align: top;"><strong>Description</strong></td><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #333333; line-height: 1.5;">${descrip}</td></tr>
+          <div style="padding: 20px;">
+            <p style="color: #333333; font-size: 15px; margin-top: 0;">Dear ${req.user.name || 'Student'},</p>
+            <p style="color: #333333; font-size: 15px; line-height: 1.5;">Your request has been recorded and automatically routed to the appropriate faculty member. We will notify you once there is an update.</p>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px;">
+              <tr><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #666666; width: 30%; min-width: 90px;"><strong>Request ID</strong></td><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #333333;"><strong>${datat.queryno}</strong></td></tr>
+              <tr><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #666666;"><strong>Category</strong></td><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #333333;">${catagorycheck.title}</td></tr>
+              <tr><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #666666; vertical-align: top;"><strong>Description</strong></td><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #333333; line-height: 1.4;">${descrip}</td></tr>
               ${attachmentRow}
             </table>
-            <div style="text-align: center; margin-top: 30px; margin-bottom: 10px;">
-              <a href="almamateapp://track_req" style="display: inline-block; padding: 14px 28px; background-color: #1a73e8; color: #ffffff; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Track Request Status</a>
+            <div style="text-align: center; margin-top: 25px; margin-bottom: 5px;">
+              <a href="almamateapp://track_req" style="display: inline-block; padding: 12px 24px; background-color: #1a73e8; color: #ffffff; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 15px; max-width: 100%; box-sizing: border-box; word-wrap: break-word;">Track Request Status</a>
             </div>
           </div>
         </div>
@@ -302,7 +300,10 @@ class Querycontroller {
       const teachersid = [...new Set(his.flatMap(item => [item.frtid, item.tid]).filter(Boolean))];
       const teachers = await teacherm.find({ tchid: { $in: teachersid } }).select("tchnam tchid");
       
-      return responsecon.successresponsewithdata(res, "Tracking histry fetch successfully", { records: his, teachers });
+      const attach = await attachmentm.find({ refno: queryfetc.queryid, isDeleted: false });
+      const attachments = attach.map(a => a._id.toString());
+      
+      return responsecon.successresponsewithdata(res, "Tracking histry fetch successfully", { records: his, teachers, attachments });
     } catch (err) {
       console.log(err);
       return responsecon.servererrorresponse(res);
@@ -361,18 +362,17 @@ class Querycontroller {
         const studentm = require("../../models/studentuser");
         const student = await studentm.findOne({ sid: query.createdby });
         if (student) {
-          // ENHANCED STUDENT RESOLVED UI
           const studentMsg = `
-          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f4f7f6; padding: 30px; text-align: center;">
-            <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: left;">
-              <div style="background-color: #2e7d32; padding: 20px; text-align: center;">
-                <h2 style="color: #ffffff; margin: 0; font-size: 20px; font-weight: 600;">Issue Resolved</h2>
+          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f4f7f6; padding: 15px; text-align: center;">
+            <div style="max-width: 600px; width: 100%; box-sizing: border-box; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: left;">
+              <div style="background-color: #2e7d32; padding: 15px 20px; text-align: center;">
+                <h2 style="color: #ffffff; margin: 0; font-size: 18px; font-weight: 600;">Issue Resolved</h2>
               </div>
-              <div style="padding: 30px;">
-                <p style="color: #333333; font-size: 16px; margin-top: 0;">Dear ${studentName},</p>
-                <p style="color: #333333; font-size: 16px; line-height: 1.5;">Your request (ID: <strong>${query.queryno}</strong>) has been fully approved by the Dean and marked as resolved.</p>
-                <div style="text-align: center; margin-top: 30px; margin-bottom: 10px;">
-                  <a href="almamateapp://track_req" style="display: inline-block; padding: 14px 28px; background-color: #2e7d32; color: #ffffff; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">View Resolution</a>
+              <div style="padding: 20px;">
+                <p style="color: #333333; font-size: 15px; margin-top: 0;">Dear ${studentName},</p>
+                <p style="color: #333333; font-size: 15px; line-height: 1.5;">Your request (ID: <strong>${query.queryno}</strong>) has been fully approved by the Dean and marked as resolved.</p>
+                <div style="text-align: center; margin-top: 25px; margin-bottom: 5px;">
+                  <a href="almamateapp://track_req" style="display: inline-block; padding: 12px 24px; background-color: #2e7d32; color: #ffffff; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 15px; max-width: 100%; box-sizing: border-box; word-wrap: break-word;">View Resolution</a>
                 </div>
               </div>
             </div>
@@ -391,28 +391,27 @@ class Querycontroller {
           actionBtn = `<a href="https://drixie-backend.onrender.com/api/v1/query/approve/${query.queryid}/resolved/token" style="display: inline-block; padding: 14px 28px; background-color: #2e7d32; color: #ffffff; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Approve (Resolve Issue)</a>`;
         }
 
-        // ENHANCED ESCALATION UI
         const msg = `
-        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f4f7f6; padding: 30px; text-align: center;">
-          <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: left;">
-            <div style="background-color: #b71c1c; padding: 20px; text-align: center;">
-              <h2 style="color: #ffffff; margin: 0; font-size: 20px; font-weight: 600;">Request Escalated for Approval</h2>
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f4f7f6; padding: 15px; text-align: center;">
+          <div style="max-width: 600px; width: 100%; box-sizing: border-box; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: left;">
+            <div style="background-color: #b71c1c; padding: 15px 20px; text-align: center;">
+              <h2 style="color: #ffffff; margin: 0; font-size: 18px; font-weight: 600;">Request Escalated for Approval</h2>
             </div>
-            <div style="padding: 30px;">
-              <p style="color: #333333; font-size: 16px; line-height: 1.5; margin-top: 0;">A request has been approved by the previous stage and requires your authorization to proceed.</p>
-              <table style="width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 15px;">
-                <tr><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #666666; width: 120px;"><strong>Request ID</strong></td><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #333333;"><strong>${query.queryno}</strong></td></tr>
-                <tr><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #666666;"><strong>Student</strong></td><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #333333;">${studentName} (${studentId})</td></tr>
-                <tr><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #666666;"><strong>Category</strong></td><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #333333;">${categoryName}</td></tr>
-                <tr><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #666666; vertical-align: top;"><strong>Description</strong></td><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #333333; line-height: 1.5;">${query.description}</td></tr>
+            <div style="padding: 20px;">
+              <p style="color: #333333; font-size: 15px; line-height: 1.5; margin-top: 0;">A request has been approved by the previous stage and requires your authorization to proceed.</p>
+              <table style="width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; border: 1px solid #ddd;">
+                <tr><td style="padding: 10px; border: 1px solid #ddd; background: #f9f9f9; width: 30%; min-width: 90px;"><strong>Request ID</strong></td><td style="padding: 10px; border: 1px solid #ddd;"><strong>${query.queryno}</strong></td></tr>
+                <tr><td style="padding: 10px; border: 1px solid #ddd; background: #f9f9f9;"><strong>Student</strong></td><td style="padding: 10px; border: 1px solid #ddd;">${studentName} (${studentId})</td></tr>
+                <tr><td style="padding: 10px; border: 1px solid #ddd; background: #f9f9f9;"><strong>Category</strong></td><td style="padding: 10px; border: 1px solid #ddd;">${categoryName}</td></tr>
+                <tr><td style="padding: 10px; border: 1px solid #ddd; background: #f9f9f9; vertical-align: top;"><strong>Description</strong></td><td style="padding: 10px; border: 1px solid #ddd; line-height: 1.4;">${query.description}</td></tr>
                 ${attachmentRow}
               </table>
-              <div style="text-align: center; margin-top: 30px; margin-bottom: 10px;">
-                ${actionBtn}
+              <div style="text-align: center; margin-top: 25px; margin-bottom: 5px;">
+                ${actionBtn.replace('padding: 14px 28px;', 'padding: 12px 24px; max-width: 100%; box-sizing: border-box; word-wrap: break-word;')}
               </div>
             </div>
           </div>
-          <p style="color: #999999; font-size: 12px; margin-top: 20px;">Automated message from Request Tracking System.</p>
+          <p style="color: #999999; font-size: 12px; margin-top: 15px;">Automated message from Request Tracking System.</p>
         </div>`;
         
         helper.sendsinglemail(nextTeacher.tchmail, `Action Required: Request ${query.queryno}`, msg);
