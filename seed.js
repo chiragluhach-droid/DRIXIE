@@ -57,7 +57,7 @@ async function seed() {
       tchdept: 'CS',
       techsch: 'Engineering',
       tchrole: 'hod',
-      isactive: tru
+      isactive: true
     });
 
     const dean = await Teacher.create({
