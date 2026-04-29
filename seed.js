@@ -9,6 +9,10 @@ const QueryDetail = require('./onestopbackend/models/querydetail');
 const ForwardHis = require('./onestopbackend/models/forwardhis');
 const Attachment = require('./onestopbackend/models/attachment');
 const SystemLog = require('./onestopbackend/models/systemlogs');
+const Comment = require('./onestopbackend/models/comment');
+const OtpTable = require('./onestopbackend/models/otpscheme');
+const TeacherActivityLog = require('./onestopbackend/models/teacheractivitylog');
+const UserActivityLog = require('./onestopbackend/models/useractivitylog');
 
 const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://chiragchehak_db_user:871NseH12P6siv5x@almamate.acmmgve.mongodb.net/almamate?appName=AlmaMate';
 
@@ -26,6 +30,15 @@ async function seed() {
     await ForwardHis.deleteMany({});
     await Attachment.deleteMany({});
     await SystemLog.deleteMany({});
+    await Comment.deleteMany({});
+    await OtpTable.deleteMany({});
+    await TeacherActivityLog.deleteMany({});
+    await UserActivityLog.deleteMany({});
+
+    // Also drop the deprecated subcategories collection entirely if it exists
+    try {
+      await mongoose.connection.db.collection('querysubcategories').drop();
+    } catch (e) { /* ignore if not exists */ }
 
     try {
       const db = mongoose.connection.db;
