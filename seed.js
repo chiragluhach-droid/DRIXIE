@@ -51,13 +51,13 @@ async function seed() {
     });
 
     const hod = await Teacher.create({
-      tchnam: 'HOD Computer Science',
-      tchmail: 'chiragluhach72@gmail.com',
+      tchnam: 'HOD Computer Sciencee',
+      tchmail: 'luhachchirag72@gmail.com',
       tchid: 'HOD001',
       tchdept: 'CS',
       techsch: 'Engineering',
       tchrole: 'hod',
-      isactive: true
+      isactive: tru
     });
 
     const dean = await Teacher.create({
