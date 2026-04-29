@@ -55,7 +55,6 @@ class Usercontroller {
       if (!checkuser)
         return responsecon.failedresponse(res, "Invalid user details");
       
-      // We still generate OTP for DB/mail unless we skip it, but let's just use a dummy bypass
       const otpsend = await helper.sendingotp(checkuser.sid, "login_to_app");
       if (!otpsend)
         return responsecon.failedresponse(
@@ -63,8 +62,12 @@ class Usercontroller {
           "Failed to generate otp please try again"
         );
       
-      // In a real app we'd send mail. We can leave it, or console log it for dev
-      console.log(`Dummy OTP for ${stdid} is 123456 (Actual OTP generated: ${otpsend})`);
+      // Send the OTP via email
+      await helper.sendsinglemail(
+        checkuser.email,
+        "Your AlmaMate Login OTP",
+        `<h3>Hello Student,</h3><p>Your one-time password (OTP) for login is: <strong style="font-size: 20px;">${otpsend}</strong></p><p>This OTP will expire in 5 minutes.</p>`
+      );
 
       await useractvtym.create({
         userId: checkuser.sid,
@@ -98,10 +101,8 @@ class Usercontroller {
       if (!checkuser)
         return responsecon.failedresponse(res, "Invalid user details");
       
-      // Dummy OTP Bypass: Accept any OTP
-      let checkotp = true;
+      const checkotp = await helper.validateotp(checkuser.sid, "login_to_app", otp);
       
-      console.log("OTP Check:", checkotp);
       if(!checkotp) return responsecon.failedresponse(res,"Invalid otp or otp expired please try again");
       
       // generate token jwt

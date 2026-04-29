@@ -6,7 +6,7 @@ const secretKeyo = process.env.SECRECTKKEYIO;
 const accessKeyIVo = process.env.ACCESSKEYIVO;
 const OTP_EXPIRY_TIME = 5 * 60 * 1000; // 5 minutes in milliseconds
 const otpgnrt = require("otp-generator");
-const nodemailer = require("nodemailer");
+const axios = require("axios");
 const otpmodel = require("../models/otpscheme");
 class Helper {
   async sessiontoken() {
@@ -52,26 +52,15 @@ class Helper {
     // }
     return com;
   }
-  // send mail
+  // send mail using Brevo API
   async sendsinglemail(mail, subject, msg) {
     try {
-      const transporter = nodemailer.createTransport({
-        service: "Gmail",
-        // host: 'smtp.gmail.com',
-        // port: 587,
-        // secure: false,
-        auth: {
-          user: process.env.GMAIL,
-          pass: process.env.GPASSWORD,
-        },
-      });
+      if (!process.env.BREVO_API_KEY) {
+        console.error("Missing BREVO_API_KEY environment variable");
+        return false;
+      }
 
-      await transporter.sendMail({
-        from: `"myMR e-Office" <${process.env.GMAIL}>`,
-        to: mail,
-        subject: subject,
-        text: msg,
-        html: `<div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px;">
+      const htmlContent = `<div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px;">
   <!-- ✅ Main Message -->
   <div style="font-size: 15px; color: #333; text-align: left; line-height: 1.6;">${msg}</div>
 
@@ -111,14 +100,26 @@ class Helper {
       </tr>
     </table>
   </div>
-</div>
+</div>`;
 
-  `,
+      const data = {
+        sender: { name: "myMR e-Office", email: "chiragchehak@gmail.com" },
+        to: [{ email: mail }],
+        subject: subject,
+        htmlContent: htmlContent
+      };
+
+      await axios.post('https://api.brevo.com/v3/smtp/email', data, {
+        headers: {
+          'api-key': process.env.BREVO_API_KEY,
+          'Content-Type': 'application/json'
+        }
       });
-      console.log("trvvbvb");
+
+      console.log("Brevo API Email Sent Successfully to:", mail);
       return true;
     } catch (err) {
-      console.log(err);
+      console.error("Brevo API Email Error:", err.response ? err.response.data : err.message);
       return false;
     }
   }
