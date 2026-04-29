@@ -258,6 +258,9 @@ class Querycontroller {
   async fetchattachments(req, res) {
     try {
       const { atid, queryid } = req.body;
+      if (!atid || !mongoose.Types.ObjectId.isValid(atid)) {
+        return responsecon.failedresponse(res, "Attachment not found");
+      }
       const up = await attachmentm.findOne({ _id: atid, refno: queryid });
       if (!up) return responsecon.failedresponse(res, "Attachment not found");
 
