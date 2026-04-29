@@ -26,6 +26,11 @@ app.use("/api/v1", apiroute);
 app.use("/api/v1/teacher", adminitroute);
 // app.use("/v1/it", adminitroute);
 
+// Root Route for browser checking
+app.get("/", (req, res) => {
+    res.status(200).send("✅ AlmaMate API is live and running!");
+});
+
 // 🔥 Error Handling Middleware
 // 404 Handler (must be after all routes)
 app.use((req, res, next) => {
