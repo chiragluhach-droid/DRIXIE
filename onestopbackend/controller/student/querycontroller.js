@@ -40,7 +40,6 @@ class Querycontroller {
       if (catagorycheck.title === "Academic Related Issues") {
         checkr = await autoforwardingm.findOne({
           catid: catagoryid,
-          subcatid: subcaragoryid,
           deptid: req.user.department,
         });
       } else {
