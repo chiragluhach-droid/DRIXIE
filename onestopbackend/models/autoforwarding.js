@@ -1,37 +1,13 @@
-// models/autoforwarding.js
-const DataTypes =require("sequelize");
-const sequelize = require("../config/database.js"); // adjust path based on your setup
+const mongoose = require('mongoose');
 
-const Autoforwarding = sequelize.define("autoforwarding", {
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
-  },
-  catid: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
-  subcatid: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
-  deptid: {
-    type: DataTypes.INTEGER,
-    allowNull: true,
-  },
-  auforwardingt:{
-    type: DataTypes.UUIDV4,
-    allowNull: true,
-  },
-  assignteacher: {
-    type: DataTypes.UUIDV4,
-    allowNull: false,
-  },
+const autoForwardingSchema = new mongoose.Schema({
+  catid: { type: String, required: true },
+  subcatid: { type: String, required: true },
+  deptid: { type: String },
+  auforwardingt: { type: String },
+  assignteacher: { type: String, required: true }
 }, {
-  tableName: "autoforwardings",
-  timestamps: true, // adds createdAt & updatedAt
-  paranoid:true
+  timestamps: true
 });
 
-module.exports= Autoforwarding;
+module.exports = mongoose.model('autoforwarding', autoForwardingSchema);

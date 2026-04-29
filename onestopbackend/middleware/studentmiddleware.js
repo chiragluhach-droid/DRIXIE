@@ -35,23 +35,10 @@ class StudentMiddleware {
     async userdatacheck(req,res,next){
         try{
             let userdetails = await usermodel.findOne({
-                where: {
-                    sid: req.user.id,
-                    isactive: true,
-                    isdelete: false
-                },
-                attributes: [
-                    'sessiontoken',
-                    'department',
-                    'university',
-                    'school',
-                    'sid',
-                    'stdid',
-                    'mobile',
-                    'email',
-                    'name',
-                ]
-            });
+                sid: req.user.id,
+                isactive: true,
+                isdelete: false
+            }).select('sessiontoken department university school sid stdid mobile email name');
             let token = req.user.aptoken;
             if (userdetails.sessiontoken == token) { //&& userdetails.role == "admin"
                 req.user = userdetails;
@@ -68,15 +55,10 @@ class StudentMiddleware {
     async usertokenchk(req, res) {
         try {
             let userdetails = await usermodel.findOne({
-                where: {
-                    sid: req.user.id,
-                    isactive: true,
-                    isdelete: false
-                },
-                attributes: [
-                    'sessiontoken',
-                ]
-            });
+                sid: req.user.id,
+                isactive: true,
+                isdelete: false
+            }).select('sessiontoken');
             let token = req.user.aptoken;
             if (userdetails.sessiontoken == token) { //&& userdetails.role == "admin"
                 return res.status(200).json({ res: true, msg: "User Validate" });

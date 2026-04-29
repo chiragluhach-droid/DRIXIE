@@ -8,49 +8,35 @@ const systemlogm = require('../../models/systemlogs');
 const commentm = require('../../models/comment');
  
 class CommentController{
-   
-    // fetch particular query 
     async fetchparticularquerycomments(req,res){
         const{queryid}=req.body;
         if(!queryid) return responsecon.failedresponse(res,"Invalid query deails");
         try{
             const fetchquery=await querymodel.findOne({
-                where:{queryid:queryid,createdby:req.user.sid},
-                attributes:['assignnow','status','catagoryid','subcaragoryid'],
-            });
+                queryid:queryid,createdby:req.user.sid
+            }).select('assignnow status catagoryid subcaragoryid');
             if(!fetchquery) return responsecon.failedresponse(res,"Invalid query id");
-            // fetch for comments 
-            const comm = await commentm.findAll({
-                where:{queryid:queryid,deletedAt:null},
-                attributes:['message','createdBy'],
-                include:[
-                    {
-                        model:teacherm,
-                        as:'teacherinfocomnt',
-                        attributes:['tchnam','tchrole','tchdept','techdesig','techcat']
-                    }
-                ]
-            });
+            
+            const comm = await commentm.find({ queryid:queryid }).select('message createdBy');
             return responsecon.successresponsewithdata(res,'comment fetched ',comm)
         }catch(err){
             return responsecon.failedresponse(res,"Please try after sometime");
         }
     }
-    // fetch comments on that query
      async addquerycomments(req,res){
         const{queryid,msg}=req.body;
         if(!queryid||!msg) return responsecon.failedresponse(res,"Invalid query deails");
         try{
             const fetchquery=await querymodel.findOne({
-                where:{queryid:queryid,deletedAt:null},
-                attributes:['assignnow','status','catagoryid','subcaragoryid'],
-            });
+                queryid:queryid
+            }).select('assignnow status catagoryid subcaragoryid');
             if(!fetchquery) return responsecon.failedresponse(res,"Invalid query id");
-            // fetch for comments 
+            
             const comm = await commentm.create({
                 queryid:queryid,
                 message:msg,
-                createdBy:req.user.tchid
+                createdBy:req.user.tchid,
+                name: req.user.name || req.user.tchnam || "Unknown"
             });
             if(!comm) return responsecon.failedresponse(res,"Comment add failed")
             return responsecon.successresponse(res,'comment Created Successfully');
@@ -58,8 +44,5 @@ class CommentController{
             return responsecon.failedresponse(res,"Please try after sometime");
         }
     }
-    /// fetch msgs on that query 
-    // send msgs on that query
-    
 }
 module.exports=new CommentController();

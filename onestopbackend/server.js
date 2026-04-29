@@ -1,7 +1,10 @@
 const express = require("express");
 require("dotenv").config();
-require('./models/association')
+const connectDB = require("./config/database");
 const app = express();
+
+// Connect to database
+connectDB();
 // 📦 Body Parser Middleware
 const cors = require("cors");
 

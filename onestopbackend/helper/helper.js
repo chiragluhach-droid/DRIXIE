@@ -73,7 +73,7 @@ class Helper {
         text: msg,
         html: `<div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px;">
   <!-- ✅ Main Message -->
-  <p style="font-size: 15px; color: #333; text-align: left;">${msg}</p>
+  <div style="font-size: 15px; color: #333; text-align: left; line-height: 1.6;">${msg}</div>
 
   <!-- ✅ Footer Section -->
   <div style="margin-top: 30px; border-top: 2px solid #e00; padding-top: 20px;">
@@ -147,12 +147,10 @@ class Helper {
   async validateotp(userid, purpose, otp) {
     try {
       let sendotp = await otpmodel.findOne({
-        where: {
           userId: userid,
           otp: otp,
           purpose: purpose,
           status: 0,
-        },
       });
       if (!sendotp) return false;
       const now = new Date();
@@ -160,28 +158,22 @@ class Helper {
       const diffInMinutes = (now - otpTime) / (1000 * 60);
 
       if (diffInMinutes > 5) {
-        await sendotp.update(
-          {
-            status: 1,
-            otp: otpgnrt.generate(10, {
-              digits: true,
-              specialChars: true,
-            }),
-          },
-          { where: { id: sendotp.id } }
-        );
-        return false;
-      }
-      await sendotp.update(
-        {
+        await sendotp.updateOne({
           status: 1,
           otp: otpgnrt.generate(10, {
             digits: true,
             specialChars: true,
           }),
-        },
-        { where: { id: sendotp.id } }
-      );
+        });
+        return false;
+      }
+        await sendotp.updateOne({
+          status: 1,
+          otp: otpgnrt.generate(10, {
+            digits: true,
+            specialChars: true,
+          }),
+        });
       return true;
     } catch (err) {
       console.log(err);

@@ -1,24 +1,10 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database'); // Adjust this to your connection path
+const mongoose = require('mongoose');
 
-const ForwardingRules = sequelize.define('forwardingrules', {
-  id: {
-    allowNull: false,
-    autoIncrement: true,
-    primaryKey: true,
-    type: DataTypes.INTEGER,
-  },
-  fromrole: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
-  torole: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
+const forwardingRulesSchema = new mongoose.Schema({
+  fromrole: { type: String, required: true },
+  torole: { type: String, required: true }
 }, {
-  timestamps: true,
-  panroid:true
+  timestamps: true
 });
 
-module.exports = ForwardingRules;
+module.exports = mongoose.model('forwardingrules', forwardingRulesSchema);

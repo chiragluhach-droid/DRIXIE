@@ -46,21 +46,10 @@ class TeacherMiddleware {
     try {
       // call other apis to verify
       let userdetails = await usermodel.findOne({
-        where: {
           tchid: req.user.id,
           isactive: true,
-          deletedAt: null,
-        },
-        attributes: [
-          "sessiontoken",
-          "tchnam",
-          "tchid",
-          "tchmail",
-          "tchrole",
-          "tchdept",
-          "techsch",
-        ],
-      });
+          isdelete: false
+      }).select('sessiontoken tchnam tchid tchmail tchrole tchdept techsch');
       let token = req.user.aptoken;
       if (userdetails.sessiontoken == token) {
         //&& userdetails.role == "admin"
@@ -82,12 +71,9 @@ class TeacherMiddleware {
   async usertokenchk(req, res) {
     try {
       let userdetails = await usermodel.findOne({
-        where: {
           tchid: req.user.id,
           isactive: true,
-        },
-        attributes: ["sessiontoken"],
-      });
+      }).select("sessiontoken");
       let token = req.user.aptoken;
       if (userdetails.sessiontoken == token) {
         //&& userdetails.role == "admin"

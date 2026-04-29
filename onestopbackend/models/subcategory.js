@@ -1,38 +1,13 @@
-'use strict';
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database'); // Adjust this to your connection path
-const Subcategory = sequelize.define('querysubcategory', {
-    id: {
-    allowNull: false,
-    autoIncrement: true,
-    primaryKey: true,
-    type: DataTypes.INTEGER,
-  },
-  title: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  description: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  responsetime: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  categoryId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
-  isactive:{
-    type:DataTypes.BOOLEAN,
-    defaultValue:true
-  }
+const mongoose = require('mongoose');
+
+const querySubcategorySchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  description: { type: String, required: true },
+  responsetime: { type: String, required: true },
+  categoryId: { type: String, required: true },
+  isactive: { type: Boolean, default: true }
 }, {
-  timestamps: true,
-  pnroid:true,
-  tableName:'querysubcategories'
+  timestamps: true
 });
 
-module.exports = Subcategory;
-
+module.exports = mongoose.model('querysubcategory', querySubcategorySchema);

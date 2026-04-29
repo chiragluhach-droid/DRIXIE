@@ -1,59 +1,16 @@
-'use strict';
+const mongoose = require('mongoose');
 
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database'); // Adjust this to your connection path
-
-const Querydetail = sequelize.define('querydetail', {
-  id: {
-    allowNull: false,
-    autoIncrement: true,
-    primaryKey: true,
-    type: DataTypes.INTEGER,
-  },
-  assignnow: {
-    type: DataTypes.UUIDV4,
-    allowNull: false,
-  },
-  description: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  queryno: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  queryid: {
-    type: DataTypes.UUIDV4,
-    allowNull: false,
-    defaultValue: DataTypes.UUIDV4,
-  },
-  createdby: {
-    type: DataTypes.UUIDV4,
-    allowNull: false,
-  },
-  status: {
-    type: DataTypes.ENUM(
-      'pending',
-      'resolved',
-      'forwardedandpending',
-      'inreview',
-      'draft'
-    ),
-    allowNull: false,
-    defaultValue: 'pending'
-  },
-  catagoryid: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
-  subcaragoryid: {
-    type: DataTypes.INTEGER,
-    allowNull: true,
-    defaultValue:0
-  },
+const queryDetailSchema = new mongoose.Schema({
+  assignnow: { type: String, required: true },
+  description: { type: String, required: true },
+  queryno: { type: String, required: true },
+  queryid: { type: String, required: true, default: () => new mongoose.Types.ObjectId().toString() },
+  createdby: { type: String, required: true },
+  status: { type: String, required: true, enum: ['pending', 'resolved', 'forwardedandpending', 'inreview', 'draft'], default: 'pending' },
+  catagoryid: { type: String, required: true },
+  subcaragoryid: { type: String, default: '0' }
 }, {
-  timestamps: true,
-  pnroid: true
+  timestamps: true
 });
 
-module.exports = Querydetail;
+module.exports = mongoose.model('querydetail', queryDetailSchema);

@@ -1,28 +1,24 @@
-'use strict';
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database'); // Adjust this to your connection path
-const Studentuser = sequelize.define('studentuser', {
-  name: {
-    type: DataTypes.STRING,
-    allowNull:false
-  },
-  mobile: { type: DataTypes.STRING,allowNull:false,unique:true },
-  email: { type: DataTypes.STRING,allowNull:false,unique:true },
-  stdid: { type: DataTypes.STRING,allowNull:false,unique:true },
-  sid: { type: DataTypes.UUID,allowNull:false,unique:true ,defaultValue:DataTypes.UUIDV4},
-  deviced: { type: DataTypes.STRING,allowNull:true },
-  sessiontoken: { type: DataTypes.STRING,allowNull:true },
-  lastlogin: { type: DataTypes.DATE,allowNull:true },
-  department: { type: DataTypes.STRING,allowNull:true },
-  university: { type: DataTypes.STRING,allowNull:true },
-  school: { type: DataTypes.STRING,allowNull:false },
-  isactive: { type: DataTypes.BOOLEAN,allowNull:false,defaultValue:true },
-  isdelete: { type: DataTypes.BOOLEAN,allowNull:false,defaultValue:false },
-  sessionstartyear: { type: DataTypes.INTEGER,allowNull:true },
-  endyear: { type: DataTypes.INTEGER,allowNull:true },
-  course: { type: DataTypes.STRING,allowNull:true }
+const mongoose = require('mongoose');
+
+const studentUserSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  mobile: { type: String, required: true, unique: true },
+  email: { type: String, required: true, unique: true },
+  stdid: { type: String, required: true, unique: true },
+  sid: { type: String, required: true, unique: true, default: () => new mongoose.Types.ObjectId().toString() },
+  deviced: { type: String },
+  sessiontoken: { type: String },
+  lastlogin: { type: Date },
+  department: { type: String },
+  university: { type: String },
+  school: { type: String, required: true },
+  isactive: { type: Boolean, required: true, default: true },
+  isdelete: { type: Boolean, required: true, default: false },
+  sessionstartyear: { type: Number },
+  endyear: { type: Number },
+  course: { type: String }
 }, {
-  timestamps: true,
-  panroid: true
-})
-module.exports = Studentuser
+  timestamps: true
+});
+
+module.exports = mongoose.model('studentuser', studentUserSchema);

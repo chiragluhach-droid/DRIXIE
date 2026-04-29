@@ -1,62 +1,19 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database'); // Adjust this to your connection path
+const mongoose = require('mongoose');
 
+const attachmentSchema = new mongoose.Schema({
+  filename: { type: String, required: true },
+  filetype: { type: String, required: true },
+  refno: { type: String },
+  url: { type: String },
+  bucket: { type: String },
+  originalname: { type: String },
+  etag: { type: String },
+  size: { type: Number },
+  uploadedBy: { type: String, required: true },
+  isTeacher: { type: Boolean, default: false },
+  isDeleted: { type: Boolean, default: false }
+}, {
+  timestamps: true
+});
 
-  const Attachment = sequelize.define('attachment', {
-    id: {
-    allowNull: false,
-    autoIncrement: true,
-    primaryKey: true,
-    type: DataTypes.INTEGER,
-  },
-    filename: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    filetype: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    refno: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    url: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    bucket: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    originalname: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    etag: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    size: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-    },
-    uploadedBy: {
-      type: DataTypes.UUID,
-      allowNull: false,
-    },
-    isTeacher: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-    },
-    isDeleted: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-    },
-
-  }, {
-    timestamps: true,
-    panroid:true,
-    tableName: 'attachments',
-  });
-  module.exports=Attachment;
+module.exports = mongoose.model('attachment', attachmentSchema);

@@ -1,61 +1,19 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database'); // Adjust this to your connection path
+const mongoose = require('mongoose');
 
-const Teachers = sequelize.define('teachers', {
-    id: {
-    allowNull: false,
-    autoIncrement: true,
-    primaryKey: true,
-    type: DataTypes.INTEGER,
-  },
-  tchid: {
-    type: DataTypes.UUID,
-    allowNull: false,
-    defaultValue:DataTypes.UUIDV4
-  },
-  tchnam: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  tchmail: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  tchrole: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  tchdept: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-  techsch: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-  techcat: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-  techdesig: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-  sessiontoken: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-   deviceid: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-  isactive: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: true,
-  },
+const teacherSchema = new mongoose.Schema({
+  tchid: { type: String, required: true, default: () => new mongoose.Types.ObjectId().toString() },
+  tchnam: { type: String, required: true },
+  tchmail: { type: String, required: true },
+  tchrole: { type: String, required: true },
+  tchdept: { type: String },
+  techsch: { type: String },
+  techcat: { type: String },
+  techdesig: { type: String },
+  sessiontoken: { type: String },
+  deviceid: { type: String },
+  isactive: { type: Boolean, default: true }
 }, {
-  timestamps: true,
-  pnroid:true
+  timestamps: true
 });
 
-module.exports = Teachers;
+module.exports = mongoose.model('teachers', teacherSchema);

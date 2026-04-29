@@ -1,34 +1,12 @@
-'use strict';
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+const mongoose = require('mongoose');
 
-const School = sequelize.define('school', {
-  id: {
-    allowNull: false,
-    autoIncrement: true,
-    primaryKey: true,
-    type: DataTypes.INTEGER,
-  },
-  name: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  scanme:{
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  categoryId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
-  isdeleted: {
-    type: DataTypes.BOOLEAN,
-    allowNull: false,
-    defaultValue: false
-  }
+const schoolSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  scanme: { type: String, required: true },
+  categoryId: { type: String, required: true },
+  isdeleted: { type: Boolean, required: true, default: false }
 }, {
-  tableName: 'schools',
-  timestamps: true,
+  timestamps: true
 });
 
-module.exports = School;
+module.exports = mongoose.model('school', schoolSchema);

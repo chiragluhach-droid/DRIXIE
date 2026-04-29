@@ -24,9 +24,9 @@ const worker = new Worker(
         console.log(`⚠️ Unknown job type: ${job.name}`);
       }
       
-      await quelog.update(
-        { status: "completed" },
-        { where: { jobid: job.id, purpose: job.name } }
+      await quelog.updateOne(
+        { jobid: job.id, purpose: job.name },
+        { status: "completed" }
       );
     } catch (err) {
       await serverlogm.create({
@@ -50,8 +50,8 @@ worker.on("completed", async (job) => {
 worker.on("failed", async (job, err) => {
   if (err) {
     console.error(`❌ Job ${job.id} failed: ${err}`);
-    await quelog.update({ status: "failed" }, { where: { jobid: job.id } });
-    await quelog.increment("attempts", { by: 1, where: { jobid: job.id } });
+    await quelog.updateOne({ jobid: job.id }, { status: "failed" });
+    await quelog.updateOne({ jobid: job.id }, { $inc: { attempts: 1 } });
     console.error(err); // full error object
   } else {
     console.error("Unknown error occurred");
