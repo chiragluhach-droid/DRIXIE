@@ -39,13 +39,63 @@ async function seed() {
       { title: 'Bus pass issue', description: 'Bus pass not generated', responsetime: '48', categoryId: cat6._id.toString(), isactive: true },
     ]);
 
-    // Add dummy teacher
-    const teacher = await Teacher.create({
+    // Add dummy teachers for each category
+    const teacherAcademic = await Teacher.create({
       tchnam: 'Ms. Deepanshi Gupta',
       tchmail: 'chiragluhach@gmail.com',
-      tchid: 'TCH001',
+      tchid: 'TCH_ACAD',
       tchdept: 'CS',
       techsch: 'Engineering',
+      tchrole: 'faculty',
+      isactive: true
+    });
+
+    const teacherHostel = await Teacher.create({
+      tchnam: 'Mr. Hostel Warden',
+      tchmail: 'warden@example.com',
+      tchid: 'TCH_HOSTEL',
+      tchdept: 'Hostel',
+      techsch: 'Administration',
+      tchrole: 'faculty',
+      isactive: true
+    });
+
+    const teacherTech = await Teacher.create({
+      tchnam: 'Mr. Tech Support',
+      tchmail: 'techsupport@example.com',
+      tchid: 'TCH_TECH',
+      tchdept: 'IT',
+      techsch: 'Administration',
+      tchrole: 'faculty',
+      isactive: true
+    });
+
+    const teacherFinance = await Teacher.create({
+      tchnam: 'Ms. Finance Officer',
+      tchmail: 'finance@example.com',
+      tchid: 'TCH_FINANCE',
+      tchdept: 'Accounts',
+      techsch: 'Administration',
+      tchrole: 'faculty',
+      isactive: true
+    });
+
+    const teacherLibrary = await Teacher.create({
+      tchnam: 'Mr. Librarian',
+      tchmail: 'library@example.com',
+      tchid: 'TCH_LIB',
+      tchdept: 'Library',
+      techsch: 'Administration',
+      tchrole: 'faculty',
+      isactive: true
+    });
+
+    const teacherTransport = await Teacher.create({
+      tchnam: 'Mr. Transport Manager',
+      tchmail: 'transport@example.com',
+      tchid: 'TCH_TRANS',
+      tchdept: 'Transport',
+      techsch: 'Administration',
       tchrole: 'faculty',
       isactive: true
     });
@@ -72,15 +122,19 @@ async function seed() {
 
     // Add auto-forwarding rules
     await AutoForwarding.create([
-      // Academic needs subcatid and deptid
-      { catid: cat1._id.toString(), subcatid: subCats[0]._id.toString(), deptid: 'CS', auforwardingt: teacher.tchid, assignteacher: teacher.tchid },
-      { catid: cat1._id.toString(), subcatid: subCats[0]._id.toString(), deptid: 'ME', auforwardingt: teacher.tchid, assignteacher: teacher.tchid },
-      // Others only need catid but schema requires subcatid
-      { catid: cat2._id.toString(), subcatid: subCats[1]._id.toString(), auforwardingt: teacher.tchid, assignteacher: teacher.tchid },
-      { catid: cat3._id.toString(), subcatid: subCats[2]._id.toString(), auforwardingt: teacher.tchid, assignteacher: teacher.tchid },
-      { catid: cat4._id.toString(), subcatid: subCats[3]._id.toString(), auforwardingt: teacher.tchid, assignteacher: teacher.tchid },
-      { catid: cat5._id.toString(), subcatid: subCats[4]._id.toString(), auforwardingt: teacher.tchid, assignteacher: teacher.tchid },
-      { catid: cat6._id.toString(), subcatid: subCats[5]._id.toString(), auforwardingt: teacher.tchid, assignteacher: teacher.tchid },
+      // Academic
+      { catid: cat1._id.toString(), subcatid: subCats[0]._id.toString(), deptid: 'CS', auforwardingt: teacherAcademic.tchid, assignteacher: teacherAcademic.tchid },
+      { catid: cat1._id.toString(), subcatid: subCats[0]._id.toString(), deptid: 'ME', auforwardingt: teacherAcademic.tchid, assignteacher: teacherAcademic.tchid },
+      // Hostel
+      { catid: cat2._id.toString(), subcatid: subCats[1]._id.toString(), auforwardingt: teacherHostel.tchid, assignteacher: teacherHostel.tchid },
+      // Technical
+      { catid: cat3._id.toString(), subcatid: subCats[2]._id.toString(), auforwardingt: teacherTech.tchid, assignteacher: teacherTech.tchid },
+      // Financial
+      { catid: cat4._id.toString(), subcatid: subCats[3]._id.toString(), auforwardingt: teacherFinance.tchid, assignteacher: teacherFinance.tchid },
+      // Library
+      { catid: cat5._id.toString(), subcatid: subCats[4]._id.toString(), auforwardingt: teacherLibrary.tchid, assignteacher: teacherLibrary.tchid },
+      // Transport
+      { catid: cat6._id.toString(), subcatid: subCats[5]._id.toString(), auforwardingt: teacherTransport.tchid, assignteacher: teacherTransport.tchid },
     ]);
 
     // Add dummy student
