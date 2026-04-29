@@ -5,6 +5,10 @@ const Student = require('./onestopbackend/models/studentuser');
 const Category = require('./onestopbackend/models/category');
 const Teacher = require('./onestopbackend/models/teachers');
 const AutoForwarding = require('./onestopbackend/models/autoforwarding');
+const QueryDetail = require('./onestopbackend/models/querydetail');
+const ForwardHis = require('./onestopbackend/models/forwardhis');
+const Attachment = require('./onestopbackend/models/attachment');
+const SystemLog = require('./onestopbackend/models/systemlogs');
 
 const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://chiragchehak_db_user:871NseH12P6siv5x@almamate.acmmgve.mongodb.net/almamate?appName=AlmaMate';
 
@@ -18,6 +22,18 @@ async function seed() {
     await Category.deleteMany({});
     await Teacher.deleteMany({});
     await AutoForwarding.deleteMany({});
+    await QueryDetail.deleteMany({});
+    await ForwardHis.deleteMany({});
+    await Attachment.deleteMany({});
+    await SystemLog.deleteMany({});
+
+    try {
+      const db = mongoose.connection.db;
+      await db.collection('uploads.files').deleteMany({});
+      await db.collection('uploads.chunks').deleteMany({});
+    } catch (err) {
+      console.log('GridFS collections not found or already empty.');
+    }
     
     console.log('Cleared existing data');
 
