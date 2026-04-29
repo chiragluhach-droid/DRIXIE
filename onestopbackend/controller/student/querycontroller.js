@@ -75,6 +75,11 @@ class Querycontroller {
         );
       }
 
+      let attachmentRow = '';
+      if (attachmntid) {
+        attachmentRow = `<tr><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #666666;"><strong>Attachment</strong></td><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #1a73e8;"><a href="https://drixie-backend.onrender.com/api/v1/preview/${attachmntid}" target="_blank" style="text-decoration: none; font-weight: bold;">View Attachment</a></td></tr>`;
+      }
+
       const techm = await teacherm.find({
         tchid: { $in: [checkr.auforwardingt, assignid].filter(Boolean) },
       }).select("tchmail");
@@ -93,6 +98,7 @@ class Querycontroller {
               <tr><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #666666;"><strong>Student</strong></td><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #333333;">${req.user.name || 'Student'} (${req.user.stdid})</td></tr>
               <tr><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #666666;"><strong>Category</strong></td><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #333333;">${catagorycheck.title}</td></tr>
               <tr><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #666666; vertical-align: top;"><strong>Description</strong></td><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #333333; line-height: 1.5;">${descrip}</td></tr>
+              ${attachmentRow}
             </table>
             <div style="text-align: center; margin-top: 30px; margin-bottom: 10px;">
               <a href="https://drixie-backend.onrender.com/api/v1/query/approve/${querycreate.queryid}/hod/token" style="display: inline-block; padding: 14px 28px; background-color: #2e7d32; color: #ffffff; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Approve & Forward to HOD</a>
@@ -126,6 +132,7 @@ class Querycontroller {
               <tr><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #666666; width: 120px;"><strong>Request ID</strong></td><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #333333;"><strong>${datat.queryno}</strong></td></tr>
               <tr><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #666666;"><strong>Category</strong></td><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #333333;">${catagorycheck.title}</td></tr>
               <tr><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #666666; vertical-align: top;"><strong>Description</strong></td><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #333333; line-height: 1.5;">${descrip}</td></tr>
+              ${attachmentRow}
             </table>
             <div style="text-align: center; margin-top: 30px; margin-bottom: 10px;">
               <a href="almamateapp://track_req" style="display: inline-block; padding: 14px 28px; background-color: #1a73e8; color: #ffffff; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Track Request Status</a>
@@ -214,10 +221,20 @@ class Querycontroller {
       if (!document) return responsecon.failedresponse(res, 'Invalid query Id');
       if (!req.file) return responsecon.failedresponse(res, 'No file uploaded');
 
+      const conn = mongoose.connection;
+      const bucket = new mongoose.mongo.GridFSBucket(conn.db, { bucketName: 'uploads' });
+      
+      const uploadStream = bucket.openUploadStream(req.file.originalname, {
+        contentType: req.file.mimetype
+      });
+      uploadStream.end(req.file.buffer);
+
+      const fileId = uploadStream.id;
+
       const attachments = await attachmentm.create({
-        filename: req.file.filename,
+        filename: req.file.originalname,
         refno: queryid,
-        url: req.file.id.toString(),
+        url: fileId.toString(),
         isTeacher: false,
         uploadedBy: req.user.sid,
         filetype: req.file.mimetype,
@@ -304,6 +321,9 @@ class Querycontroller {
       const studentId = student ? student.stdid : 'N/A';
       const categoryName = query.catagoryid ? query.catagoryid.title : 'General';
       
+      const attach = await attachmentm.findOne({ refno: query.queryid, isDeleted: false });
+      const attachmentRow = attach ? `<tr><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #666666;"><strong>Attachment</strong></td><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #1a73e8;"><a href="https://drixie-backend.onrender.com/api/v1/preview/${attach._id}" target="_blank" style="text-decoration: none; font-weight: bold;">View Attachment</a></td></tr>` : '';
+      
       let nextStatus = '';
       let nextTeacherRole = '';
       let teacherLabel = '';
@@ -385,6 +405,7 @@ class Querycontroller {
                 <tr><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #666666;"><strong>Student</strong></td><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #333333;">${studentName} (${studentId})</td></tr>
                 <tr><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #666666;"><strong>Category</strong></td><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #333333;">${categoryName}</td></tr>
                 <tr><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #666666; vertical-align: top;"><strong>Description</strong></td><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #333333; line-height: 1.5;">${query.description}</td></tr>
+                ${attachmentRow}
               </table>
               <div style="text-align: center; margin-top: 30px; margin-bottom: 10px;">
                 ${actionBtn}
