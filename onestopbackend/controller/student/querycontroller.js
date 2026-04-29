@@ -92,13 +92,15 @@ class Querycontroller {
           </div>
           <div style="padding: 20px;">
             <p style="color: #333333; font-size: 15px; line-height: 1.5; margin-top: 0;">A student has raised a new query that has been automatically routed to your department for review.</p>
-            <table style="width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px;">
-              <tr><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #666666; width: 30%; min-width: 90px;"><strong>Request ID</strong></td><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #333333;"><strong>${datat.queryno}</strong></td></tr>
-              <tr><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #666666;"><strong>Student</strong></td><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #333333;">${req.user.name || 'Student'} (${req.user.stdid})</td></tr>
-              <tr><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #666666;"><strong>Category</strong></td><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #333333;">${catagorycheck.title}</td></tr>
-              <tr><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #666666; vertical-align: top;"><strong>Description</strong></td><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #333333; line-height: 1.4;">${descrip}</td></tr>
-              ${attachmentRow}
-            </table>
+            <div style="overflow-x: auto;">
+              <table style="width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; table-layout: fixed; word-wrap: break-word;">
+                <tr><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #666666; width: 35%;"><strong>Request ID</strong></td><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #333333;"><strong>${datat.queryno}</strong></td></tr>
+                <tr><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #666666;"><strong>Student</strong></td><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #333333;">${req.user.name || 'Student'} (${req.user.stdid})</td></tr>
+                <tr><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #666666;"><strong>Category</strong></td><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #333333;">${catagorycheck.title}</td></tr>
+                <tr><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #666666; vertical-align: top;"><strong>Description</strong></td><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #333333; line-height: 1.4;">${descrip}</td></tr>
+                ${attachmentRow}
+              </table>
+            </div>
             <div style="text-align: center; margin-top: 25px; margin-bottom: 5px;">
               <a href="https://drixie-backend.onrender.com/api/v1/query/approve/${querycreate.queryid}/hod/token" style="display: inline-block; padding: 12px 24px; background-color: #2e7d32; color: #ffffff; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 15px; max-width: 100%; box-sizing: border-box; word-wrap: break-word;">Approve & Forward to HOD</a>
             </div>
@@ -126,12 +128,14 @@ class Querycontroller {
           <div style="padding: 20px;">
             <p style="color: #333333; font-size: 15px; margin-top: 0;">Dear ${req.user.name || 'Student'},</p>
             <p style="color: #333333; font-size: 15px; line-height: 1.5;">Your request has been recorded and automatically routed to the appropriate faculty member. We will notify you once there is an update.</p>
-            <table style="width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px;">
-              <tr><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #666666; width: 30%; min-width: 90px;"><strong>Request ID</strong></td><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #333333;"><strong>${datat.queryno}</strong></td></tr>
-              <tr><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #666666;"><strong>Category</strong></td><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #333333;">${catagorycheck.title}</td></tr>
-              <tr><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #666666; vertical-align: top;"><strong>Description</strong></td><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #333333; line-height: 1.4;">${descrip}</td></tr>
-              ${attachmentRow}
-            </table>
+            <div style="overflow-x: auto;">
+              <table style="width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; table-layout: fixed; word-wrap: break-word;">
+                <tr><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #666666; width: 35%;"><strong>Request ID</strong></td><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #333333;"><strong>${datat.queryno}</strong></td></tr>
+                <tr><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #666666;"><strong>Category</strong></td><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #333333;">${catagorycheck.title}</td></tr>
+                <tr><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #666666; vertical-align: top;"><strong>Description</strong></td><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #333333; line-height: 1.4;">${descrip}</td></tr>
+                ${attachmentRow}
+              </table>
+            </div>
             <div style="text-align: center; margin-top: 25px; margin-bottom: 5px;">
               <a href="almamateapp://track_req" style="display: inline-block; padding: 12px 24px; background-color: #1a73e8; color: #ffffff; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 15px; max-width: 100%; box-sizing: border-box; word-wrap: break-word;">Track Request Status</a>
             </div>
@@ -255,11 +259,11 @@ class Querycontroller {
   async fetchattachments(req, res) {
     try {
       const { atid, queryid } = req.body;
-      const up = await attachmentm.findOne({ _id: atid, refno: queryid, isDeleted: false });
+      const up = await attachmentm.findOne({ _id: atid, refno: queryid });
       if (!up) return responsecon.failedresponse(res, "Attachment not found");
 
       const dataa = {
-        previewUrl: `http://127.0.0.1:3000/api/v1/preview/${up._id}`,
+        previewUrl: `https://drixie-backend.onrender.com/api/v1/preview/${up._id}`,
         name: up.filename,
       };
       return responsecon.successresponsewithdata(res, "Attachment fetch successfully", dataa);
@@ -300,7 +304,7 @@ class Querycontroller {
       const teachersid = [...new Set(his.flatMap(item => [item.frtid, item.tid]).filter(Boolean))];
       const teachers = await teacherm.find({ tchid: { $in: teachersid } }).select("tchnam tchid");
       
-      const attach = await attachmentm.find({ refno: queryfetc.queryid, isDeleted: false });
+      const attach = await attachmentm.find({ refno: queryfetc.queryid });
       const attachments = attach.map(a => a._id.toString());
       
       return responsecon.successresponsewithdata(res, "Tracking histry fetch successfully", { records: his, teachers, attachments });
@@ -322,8 +326,8 @@ class Querycontroller {
       const studentId = student ? student.stdid : 'N/A';
       const categoryName = query.catagoryid ? query.catagoryid.title : 'General';
       
-      const attach = await attachmentm.findOne({ refno: query.queryid, isDeleted: false });
-      const attachmentRow = attach ? `<tr><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #666666;"><strong>Attachment</strong></td><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #1a73e8;"><a href="https://drixie-backend.onrender.com/api/v1/preview/${attach._id}" target="_blank" style="text-decoration: none; font-weight: bold;">View Attachment</a></td></tr>` : '';
+      const attach = await attachmentm.findOne({ refno: query.queryid });
+      const attachmentRow = attach ? `<tr><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #666666; width: 35%;"><strong>Attachment</strong></td><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #1a73e8;"><a href="https://drixie-backend.onrender.com/api/v1/preview/${attach._id}" target="_blank" style="text-decoration: none; font-weight: bold;">View Attachment</a></td></tr>` : '';
       
       let nextStatus = '';
       let nextTeacherRole = '';
@@ -399,13 +403,15 @@ class Querycontroller {
             </div>
             <div style="padding: 20px;">
               <p style="color: #333333; font-size: 15px; line-height: 1.5; margin-top: 0;">A request has been approved by the previous stage and requires your authorization to proceed.</p>
-              <table style="width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; border: 1px solid #ddd;">
-                <tr><td style="padding: 10px; border: 1px solid #ddd; background: #f9f9f9; width: 30%; min-width: 90px;"><strong>Request ID</strong></td><td style="padding: 10px; border: 1px solid #ddd;"><strong>${query.queryno}</strong></td></tr>
-                <tr><td style="padding: 10px; border: 1px solid #ddd; background: #f9f9f9;"><strong>Student</strong></td><td style="padding: 10px; border: 1px solid #ddd;">${studentName} (${studentId})</td></tr>
-                <tr><td style="padding: 10px; border: 1px solid #ddd; background: #f9f9f9;"><strong>Category</strong></td><td style="padding: 10px; border: 1px solid #ddd;">${categoryName}</td></tr>
-                <tr><td style="padding: 10px; border: 1px solid #ddd; background: #f9f9f9; vertical-align: top;"><strong>Description</strong></td><td style="padding: 10px; border: 1px solid #ddd; line-height: 1.4;">${query.description}</td></tr>
-                ${attachmentRow}
-              </table>
+              <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; border: 1px solid #ddd; table-layout: fixed; word-wrap: break-word;">
+                  <tr><td style="padding: 10px; border: 1px solid #ddd; background: #f9f9f9; width: 35%;"><strong>Request ID</strong></td><td style="padding: 10px; border: 1px solid #ddd;"><strong>${query.queryno}</strong></td></tr>
+                  <tr><td style="padding: 10px; border: 1px solid #ddd; background: #f9f9f9;"><strong>Student</strong></td><td style="padding: 10px; border: 1px solid #ddd;">${studentName} (${studentId})</td></tr>
+                  <tr><td style="padding: 10px; border: 1px solid #ddd; background: #f9f9f9;"><strong>Category</strong></td><td style="padding: 10px; border: 1px solid #ddd;">${categoryName}</td></tr>
+                  <tr><td style="padding: 10px; border: 1px solid #ddd; background: #f9f9f9; vertical-align: top;"><strong>Description</strong></td><td style="padding: 10px; border: 1px solid #ddd; line-height: 1.4;">${query.description}</td></tr>
+                  ${attachmentRow}
+                </table>
+              </div>
               <div style="text-align: center; margin-top: 25px; margin-bottom: 5px;">
                 ${actionBtn.replace('padding: 14px 28px;', 'padding: 12px 24px; max-width: 100%; box-sizing: border-box; word-wrap: break-word;')}
               </div>
