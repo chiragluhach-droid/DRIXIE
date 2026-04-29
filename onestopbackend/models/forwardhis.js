@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const forwardHistorySchema = new mongoose.Schema({
-  queryid: { type: String, required: true, unique: true },
+  queryid: { type: String, required: true },
   frtid: { type: String, required: true },
   frtn: { type: String },
   frtr: { type: String },
@@ -12,7 +12,7 @@ const forwardHistorySchema = new mongoose.Schema({
   trl: { type: String },
   tdsg: { type: String },
   tsch: { type: String },
-  status: { type: String, required: true, enum: ['pending', 'resolved', 'forwardedandpending', 'inreview', 'draft'], default: 'pending' },
+  status: { type: String, required: true, enum: ['pending', 'resolved', 'forwardedandpending', 'inreview', 'draft', 'pending_teacher', 'pending_hod', 'pending_dean'], default: 'pending' },
   notes: { type: String, required: true }
 }, {
   timestamps: true

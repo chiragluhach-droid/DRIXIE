@@ -89,8 +89,7 @@ class Querycontroller {
           <tr><td style="padding: 10px; border: 1px solid #ddd; background: #f9f9f9;"><strong>Description:</strong></td><td style="padding: 10px; border: 1px solid #ddd;">${descrip}</td></tr>
         </table>
         <br/>
-        <a href="https://drixie-backend.onrender.com/api/v1/query/approve/${querycreate.queryid}/hod/token" style="display: inline-block; padding: 12px 24px; background-color: #2e7d32; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; margin-right: 10px;">Approve & Forward to HOD</a>
-        <a href="http://127.0.0.1:3000" style="display: inline-block; padding: 12px 24px; background-color: #b71c1c; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">View Ticket Details</a>
+        <a href="https://drixie-backend.onrender.com/api/v1/query/approve/${querycreate.queryid}/hod/token" style="display: inline-block; padding: 12px 24px; background-color: #2e7d32; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">Approve & Forward to HOD</a>
       `;
 
       if (techm && techm.length > 0) {
