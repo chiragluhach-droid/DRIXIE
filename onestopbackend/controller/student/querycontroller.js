@@ -112,7 +112,7 @@ class Querycontroller {
           <tr><td style="padding: 10px; border: 1px solid #ddd; background: #f9f9f9;"><strong>Description:</strong></td><td style="padding: 10px; border: 1px solid #ddd;">${descrip}</td></tr>
         </table>
         <br/>
-        <a href="http://127.0.0.1:8081" style="display: inline-block; padding: 12px 24px; background-color: #1a73e8; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">Track Request Status</a>
+        <a href="almamateapp://track_req" style="display: inline-block; padding: 12px 24px; background-color: #1a73e8; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">Track Request Status</a>
       `;
 
       afterCommitTasks.push(
