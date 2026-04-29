@@ -41,7 +41,7 @@ async function seed() {
 
     // Add dummy teacher
     const teacher = await Teacher.create({
-      tchnam: 'Dummy Teacher',
+      tchnam: 'Ms. Deepanshi Gupta',
       tchmail: 'chiragluhach@gmail.com',
       tchid: 'TCH001',
       tchdept: 'CS',
@@ -51,7 +51,7 @@ async function seed() {
     });
 
     const hod = await Teacher.create({
-      tchnam: 'HOD Computer Sciencee',
+      tchnam: 'Dr. Chandni Magoo',
       tchmail: 'luhachchirag72@gmail.com',
       tchid: 'HOD001',
       tchdept: 'CS',
@@ -61,7 +61,7 @@ async function seed() {
     });
 
     const dean = await Teacher.create({
-      tchnam: 'Dean of Engineering',
+      tchnam: 'Dr. Deependra Kumar Jha',
       tchmail: 'luhachchirag@gmail.com',
       tchid: 'DEAN001',
       tchdept: 'All',
@@ -86,9 +86,9 @@ async function seed() {
     // Add dummy student
     await Student.create([
       {
-        name: 'Dummy Student 1',
+        name: 'Chirag Luhach',
         email: 'chiragchehak@gmail.com',
-        mobile: '1234567890',
+        sid: 'SID001',
         stdid: 'STU001',
         department: 'CS',
         university: 'MRU',
@@ -96,6 +96,7 @@ async function seed() {
         sessionstartyear: '2023',
         endyear: '2027',
         course: 'B.Tech',
+        mobile: '1234567890'
       },
       {
         name: 'Dummy Student 2',

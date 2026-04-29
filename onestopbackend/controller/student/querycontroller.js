@@ -276,8 +276,14 @@ class Querycontroller {
   async approveQueryStage(req, res) {
     const { queryid, nextstage, token } = req.params;
     try {
-      const query = await querymodel.findOne({ queryid: queryid });
+      const query = await querymodel.findOne({ queryid: queryid }).populate('catagoryid');
       if (!query) return res.status(404).send("Query not found");
+
+      const studentm = require("../../models/studentuser");
+      const student = await studentm.findOne({ sid: query.createdby });
+      const studentName = student ? student.name : 'Unknown';
+      const studentId = student ? student.stdid : 'N/A';
+      const categoryName = query.catagoryid ? query.catagoryid.title : 'General';
       
       let nextStatus = '';
       let nextTeacherRole = '';
@@ -336,7 +342,13 @@ class Querycontroller {
 
         const msg = `
           <h3 style="color: #b71c1c; margin-top: 0;">Request Escalated for Your Approval</h3>
-          <p>A request (ID: ${query.queryno}) has been approved by the previous stage and requires your authorization.</p>
+          <p>A request has been approved by the previous stage and requires your authorization to proceed.</p>
+          <table style="width: 100%; border-collapse: collapse; margin-top: 15px; border: 1px solid #ddd;">
+            <tr><td style="padding: 10px; border: 1px solid #ddd; background: #f9f9f9; width: 130px;"><strong>Request ID:</strong></td><td style="padding: 10px; border: 1px solid #ddd;"><strong>${query.queryno}</strong></td></tr>
+            <tr><td style="padding: 10px; border: 1px solid #ddd; background: #f9f9f9;"><strong>Student:</strong></td><td style="padding: 10px; border: 1px solid #ddd;">${studentName} (${studentId})</td></tr>
+            <tr><td style="padding: 10px; border: 1px solid #ddd; background: #f9f9f9;"><strong>Category:</strong></td><td style="padding: 10px; border: 1px solid #ddd;">${categoryName}</td></tr>
+            <tr><td style="padding: 10px; border: 1px solid #ddd; background: #f9f9f9;"><strong>Description:</strong></td><td style="padding: 10px; border: 1px solid #ddd;">${query.description}</td></tr>
+          </table>
           <br/>
           ${actionBtn}
         `;
