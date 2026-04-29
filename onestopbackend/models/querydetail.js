@@ -6,7 +6,7 @@ const queryDetailSchema = new mongoose.Schema({
   queryno: { type: String, required: true },
   queryid: { type: String, required: true, default: () => new mongoose.Types.ObjectId().toString() },
   createdby: { type: String, required: true },
-  status: { type: String, required: true, enum: ['pending', 'resolved', 'forwardedandpending', 'inreview', 'draft'], default: 'pending' },
+  status: { type: String, required: true, enum: ['pending', 'resolved', 'forwardedandpending', 'inreview', 'draft', 'pending_teacher', 'pending_hod', 'pending_dean'], default: 'pending_teacher' },
   catagoryid: { type: String, required: true },
   subcaragoryid: { type: String, default: '0' }
 }, {

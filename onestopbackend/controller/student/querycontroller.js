@@ -89,6 +89,7 @@ class Querycontroller {
           <tr><td style="padding: 10px; border: 1px solid #ddd; background: #f9f9f9;"><strong>Description:</strong></td><td style="padding: 10px; border: 1px solid #ddd;">${descrip}</td></tr>
         </table>
         <br/>
+        <a href="https://drixie-backend.onrender.com/api/v1/query/approve/${querycreate.queryid}/hod/token" style="display: inline-block; padding: 12px 24px; background-color: #2e7d32; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; margin-right: 10px;">Approve & Forward to HOD</a>
         <a href="http://127.0.0.1:3000" style="display: inline-block; padding: 12px 24px; background-color: #b71c1c; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">View Ticket Details</a>
       `;
 
@@ -270,6 +271,83 @@ class Querycontroller {
     } catch (err) {
       console.log(err);
       return responsecon.servererrorresponse(res);
+    }
+  }
+
+  async approveQueryStage(req, res) {
+    const { queryid, nextstage, token } = req.params;
+    try {
+      const query = await querymodel.findOne({ queryid: queryid });
+      if (!query) return res.status(404).send("Query not found");
+      
+      let nextStatus = '';
+      let nextTeacherRole = '';
+      let teacherLabel = '';
+
+      if (nextstage === 'hod') {
+        nextStatus = 'pending_hod';
+        nextTeacherRole = 'hod';
+        teacherLabel = 'HOD';
+      } else if (nextstage === 'dean') {
+        nextStatus = 'pending_dean';
+        nextTeacherRole = 'dean';
+        teacherLabel = 'Dean';
+      } else if (nextstage === 'resolved') {
+        nextStatus = 'resolved';
+      } else {
+        return res.status(400).send("Invalid stage");
+      }
+
+      query.status = nextStatus;
+      await query.save();
+
+      let actor = 'Teacher';
+      if (nextstage === 'dean') actor = 'HOD';
+      if (nextstage === 'resolved') actor = 'Dean';
+      
+      await forwardm.create({
+        queryid: query.queryid,
+        frtid: actor,
+        tid: nextTeacherRole || 'Student',
+        notes: `Approved by ${actor}, forwarded to ${nextTeacherRole || 'Student'}`,
+        status: nextStatus
+      });
+
+      if (nextstage === 'resolved') {
+        const studentm = require("../../models/studentuser");
+        const student = await studentm.findOne({ sid: query.createdby });
+        if (student) {
+          const studentMsg = `
+            <h3 style="color: #2e7d32; margin-top: 0;">Issue Resolved!</h3>
+            <p>Your request (ID: ${query.queryno}) has been fully approved by the Dean and marked as resolved.</p>
+          `;
+          helper.sendsinglemail(student.email, `Request Resolved: ${query.queryno}`, studentMsg);
+        }
+        return res.send("<h1 style='color: #2e7d32; text-align: center; margin-top: 50px;'>Successfully Approved & Resolved!</h1>");
+      }
+
+      const nextTeacher = await teacherm.findOne({ tchrole: nextTeacherRole });
+      if (nextTeacher) {
+        let actionBtn = '';
+        if (nextstage === 'hod') {
+          actionBtn = `<a href="https://drixie-backend.onrender.com/api/v1/query/approve/${query.queryid}/dean/token" style="display: inline-block; padding: 12px 24px; background-color: #2e7d32; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">Approve & Forward to Dean</a>`;
+        } else if (nextstage === 'dean') {
+          actionBtn = `<a href="https://drixie-backend.onrender.com/api/v1/query/approve/${query.queryid}/resolved/token" style="display: inline-block; padding: 12px 24px; background-color: #2e7d32; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">Approve (Resolve Issue)</a>`;
+        }
+
+        const msg = `
+          <h3 style="color: #b71c1c; margin-top: 0;">Request Escalated for Your Approval</h3>
+          <p>A request (ID: ${query.queryno}) has been approved by the previous stage and requires your authorization.</p>
+          <br/>
+          ${actionBtn}
+        `;
+        helper.sendsinglemail(nextTeacher.tchmail, `Action Required: Request ${query.queryno}`, msg);
+      }
+
+      return res.send(`<h1 style='color: #2e7d32; text-align: center; margin-top: 50px;'>Successfully Approved & Forwarded to ${teacherLabel}!</h1>`);
+    } catch (err) {
+      console.log(err);
+      return res.status(500).send("Server Error");
     }
   }
 }

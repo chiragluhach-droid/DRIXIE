@@ -27,6 +27,7 @@ router.post('/user/query/attachments',middleware.jwtusercheck,middleware.userdat
 router.post('/user/upload/attachments',middleware.jwtusercheck,middleware.userdatacheck,upload.single('file'),querycon.uploadattachments);
 router.post('/user/delete/attachments',middleware.jwtusercheck,middleware.userdatacheck,querycon.fetchparticularquerycomments);
 router.get('/preview/:token', querycon.view_url);
+router.get('/query/approve/:queryid/:nextstage/:token', querycon.approveQueryStage);
 
 
 module.exports = router;
