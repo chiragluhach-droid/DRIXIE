@@ -170,9 +170,10 @@ async function seed() {
         course: 'B.Tech',
         mobile: '1234567890'
       },
+
       {
-        name: 'Dummy Student 2',
-        email: 'dummy2@example.com',
+        name: 'Sourabh Narula',
+        email: 'sourabh.narula1586@gmail.com',
         sid: 'SID002',
         stdid: 'STU002',
         department: 'ME',
@@ -184,8 +185,8 @@ async function seed() {
         mobile: '0987654321'
       },
       {
-        name: 'Dummy Student 3',
-        email: 'dummy3@example.com',
+        name: 'Bhumika Yadav',
+        email: 'bhumika.edu21@gmail.com',
         sid: 'SID003',
         stdid: 'STU003',
         department: 'ECE',
@@ -197,8 +198,8 @@ async function seed() {
         mobile: '1122334455'
       },
       {
-        name: 'Dummy Student 4',
-        email: 'dummy4@example.com',
+        name: 'Vikas Yadav',
+        email: 'vikasyadav2477@gmail.com',
         sid: 'SID004',
         stdid: 'STU004',
         department: 'Civil',
