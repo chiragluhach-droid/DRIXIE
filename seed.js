@@ -173,7 +173,7 @@ async function seed() {
       {
         name: 'Dummy Student 2',
         email: 'dummy2@example.com',
-        mobile: '0987654321',
+        sid: 'SID002',
         stdid: 'STU002',
         department: 'ME',
         university: 'MRU',
@@ -181,11 +181,38 @@ async function seed() {
         sessionstartyear: '2022',
         endyear: '2026',
         course: 'B.Tech',
+        mobile: '0987654321'
+      },
+      {
+        name: 'Dummy Student 3',
+        email: 'dummy3@example.com',
+        sid: 'SID003',
+        stdid: 'STU003',
+        department: 'ECE',
+        university: 'MRU',
+        school: 'Engineering',
+        sessionstartyear: '2023',
+        endyear: '2027',
+        course: 'B.Tech',
+        mobile: '1122334455'
+      },
+      {
+        name: 'Dummy Student 4',
+        email: 'dummy4@example.com',
+        sid: 'SID004',
+        stdid: 'STU004',
+        department: 'Civil',
+        university: 'MRU',
+        school: 'Engineering',
+        sessionstartyear: '2021',
+        endyear: '2025',
+        course: 'B.Tech',
+        mobile: '5566778899'
       }
     ]);
 
     console.log('Seed data inserted successfully!');
-    console.log('You can login with Student ID: STU001 and OTP: 1234');
+    console.log('You can login with Student IDs: STU001, STU002, STU003, or STU004 (OTP is always: 1234)');
     
   } catch (err) {
     console.error('Seed error:', err);
