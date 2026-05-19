@@ -1,18 +1,18 @@
 const mongoose = require('mongoose');
 require('dotenv').config();
 
-const Student = require('./onestopbackend/models/studentuser');
-const Category = require('./onestopbackend/models/category');
-const Teacher = require('./onestopbackend/models/teachers');
-const AutoForwarding = require('./onestopbackend/models/autoforwarding');
-const QueryDetail = require('./onestopbackend/models/querydetail');
-const ForwardHis = require('./onestopbackend/models/forwardhis');
-const Attachment = require('./onestopbackend/models/attachment');
-const SystemLog = require('./onestopbackend/models/systemlogs');
-const Comment = require('./onestopbackend/models/comment');
-const OtpTable = require('./onestopbackend/models/otpscheme');
-const TeacherActivityLog = require('./onestopbackend/models/teacheractivitylog');
-const UserActivityLog = require('./onestopbackend/models/useractivitylog');
+const Student = require('./models/studentuser');
+const Category = require('./models/category');
+const Teacher = require('./models/teachers');
+const AutoForwarding = require('./models/autoforwarding');
+const QueryDetail = require('./models/querydetail');
+const ForwardHis = require('./models/forwardhis');
+const Attachment = require('./models/attachment');
+const SystemLog = require('./models/systemlogs');
+const Comment = require('./models/comment');
+const OtpTable = require('./models/otpscheme');
+const TeacherActivityLog = require('./models/teacheractivitylog');
+const UserActivityLog = require('./models/useractivitylog');
 
 const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://chiragchehak_db_user:871NseH12P6siv5x@almamate.acmmgve.mongodb.net/almamate?appName=AlmaMate';
 
@@ -70,7 +70,7 @@ async function seed() {
 
     const teacherHostel = await Teacher.create({
       tchnam: 'Mr. Hostel Warden',
-      tchmail: 'warden@example.com',
+      tchmail: 'chehakjaat@gmail.com',
       tchid: 'TCH_HOSTEL',
       tchdept: 'Hostel',
       techsch: 'Administration',
@@ -143,6 +143,9 @@ async function seed() {
       // Academic
       { catid: cat1._id.toString(), deptid: 'CS', auforwardingt: teacherAcademic.tchid, assignteacher: teacherAcademic.tchid },
       { catid: cat1._id.toString(), deptid: 'ME', auforwardingt: teacherAcademic.tchid, assignteacher: teacherAcademic.tchid },
+      { catid: cat1._id.toString(), deptid: 'ECE', auforwardingt: teacherAcademic.tchid, assignteacher: teacherAcademic.tchid },
+      { catid: cat1._id.toString(), deptid: 'Civil', auforwardingt: teacherAcademic.tchid, assignteacher: teacherAcademic.tchid },
+      { catid: cat1._id.toString(), deptid: 'All', auforwardingt: teacherAcademic.tchid, assignteacher: teacherAcademic.tchid },
       // Hostel
       { catid: cat2._id.toString(), auforwardingt: teacherHostel.tchid, assignteacher: teacherHostel.tchid },
       // Technical
@@ -172,8 +175,8 @@ async function seed() {
       },
 
       {
-        name: 'Sourabh Narula',
-        email: 'sourabh.narula1586@gmail.com',
+        name: 'Sanchit Chugh',
+        email: 'sanchitchugh7@gmail.com',
         sid: 'SID002',
         stdid: 'STU002',
         department: 'ME',
@@ -199,7 +202,7 @@ async function seed() {
       },
       {
         name: 'Vikas Yadav',
-        email: 'vikasyadav2477@gmail.com',
+        email: 'gochaxxx0011@gmail.com',
         sid: 'SID004',
         stdid: 'STU004',
         department: 'Civil',

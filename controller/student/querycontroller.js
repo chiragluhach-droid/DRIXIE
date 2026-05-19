@@ -42,6 +42,17 @@ class Querycontroller {
           catid: catagoryid,
           deptid: req.user.department,
         });
+        if (!checkr) {
+          checkr = await autoforwardingm.findOne({
+            catid: catagoryid,
+            deptid: 'All'
+          });
+        }
+        if (!checkr) {
+          checkr = await autoforwardingm.findOne({
+            catid: catagoryid
+          });
+        }
       } else {
         checkr = await autoforwardingm.findOne({
           catid: catagoryid,
@@ -76,7 +87,7 @@ class Querycontroller {
 
       let attachmentRow = '';
       if (attachmntid) {
-        attachmentRow = `<tr><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #666666;"><strong>Attachment</strong></td><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #1a73e8;"><a href="https://drixie-backend.onrender.com/api/v1/preview/${attachmntid}" target="_blank" style="text-decoration: none; font-weight: bold;">View Attachment</a></td></tr>`;
+        attachmentRow = `<tr><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #666666;"><strong>Attachment</strong></td><td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #1a73e8;"><a href="${process.env.BACKEND_URL || 'http://127.0.0.1:3000'}/api/v1/preview/${attachmntid}" target="_blank" style="text-decoration: none; font-weight: bold;">View Attachment</a></td></tr>`;
       }
 
       const techm = await teacherm.find({
@@ -101,7 +112,7 @@ class Querycontroller {
               </table>
             </div>
             <div style="text-align: center; margin-top: 25px; margin-bottom: 5px;">
-              <a href="https://drixie-backend.onrender.com/api/v1/query/approve/${querycreate.queryid}/hod/token" style="display: inline-block; padding: 12px 24px; background-color: #2e7d32; color: #ffffff; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 15px; max-width: 100%; box-sizing: border-box; word-wrap: break-word;">Approve & Forward to HOD</a>
+              <a href="${process.env.BACKEND_URL || 'http://127.0.0.1:3000'}/api/v1/query/approve/${querycreate.queryid}/hod/token" style="display: inline-block; padding: 12px 24px; background-color: #2e7d32; color: #ffffff; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 15px; max-width: 100%; box-sizing: border-box; word-wrap: break-word;">Approve & Forward to HOD</a>
             </div>
           </div>
         </div>
@@ -265,7 +276,7 @@ class Querycontroller {
       if (!up) return responsecon.failedresponse(res, "Attachment not found");
 
       const dataa = {
-        previewUrl: `https://drixie-backend.onrender.com/api/v1/preview/${up._id}`,
+        previewUrl: `${process.env.BACKEND_URL || 'http://127.0.0.1:3000'}/api/v1/preview/${up._id}`,
         name: up.filename,
       };
       return responsecon.successresponsewithdata(res, "Attachment fetch successfully", dataa);
@@ -329,7 +340,7 @@ class Querycontroller {
       const categoryName = query.catagoryid ? query.catagoryid.title : 'General';
       
       const attach = await attachmentm.findOne({ refno: query.queryid });
-      const attachmentRow = attach ? `<tr><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #666666; width: 35%;"><strong>Attachment</strong></td><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #1a73e8;"><a href="https://drixie-backend.onrender.com/api/v1/preview/${attach._id}" target="_blank" style="text-decoration: none; font-weight: bold;">View Attachment</a></td></tr>` : '';
+      const attachmentRow = attach ? `<tr><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #666666; width: 35%;"><strong>Attachment</strong></td><td style="padding: 10px; border-bottom: 1px solid #eeeeee; color: #1a73e8;"><a href="${process.env.BACKEND_URL || 'http://127.0.0.1:3000'}/api/v1/preview/${attach._id}" target="_blank" style="text-decoration: none; font-weight: bold;">View Attachment</a></td></tr>` : '';
       
       let nextStatus = '';
       let nextTeacherRole = '';
@@ -392,9 +403,9 @@ class Querycontroller {
       if (nextTeacher) {
         let actionBtn = '';
         if (nextstage === 'hod') {
-          actionBtn = `<a href="https://drixie-backend.onrender.com/api/v1/query/approve/${query.queryid}/dean/token" style="display: inline-block; padding: 14px 28px; background-color: #2e7d32; color: #ffffff; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Approve & Forward to Dean</a>`;
+          actionBtn = `<a href="${process.env.BACKEND_URL || 'http://127.0.0.1:3000'}/api/v1/query/approve/${query.queryid}/dean/token" style="display: inline-block; padding: 14px 28px; background-color: #2e7d32; color: #ffffff; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Approve & Forward to Dean</a>`;
         } else if (nextstage === 'dean') {
-          actionBtn = `<a href="https://drixie-backend.onrender.com/api/v1/query/approve/${query.queryid}/resolved/token" style="display: inline-block; padding: 14px 28px; background-color: #2e7d32; color: #ffffff; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Approve (Resolve Issue)</a>`;
+          actionBtn = `<a href="${process.env.BACKEND_URL || 'http://127.0.0.1:3000'}/api/v1/query/approve/${query.queryid}/resolved/token" style="display: inline-block; padding: 14px 28px; background-color: #2e7d32; color: #ffffff; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Approve (Resolve Issue)</a>`;
         }
 
         const msg = `
